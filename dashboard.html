@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>דאשבורד שיווק | True Beauty</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <style>
+        @font-face { font-family: 'Ping'; src: url('https://my-fonts-bucket-results.s3.eu-north-1.amazonaws.com/pingnew/ping-regular.woff2') format('woff2'); font-weight: 400; }
+        @font-face { font-family: 'Ping'; src: url('https://my-fonts-bucket-results.s3.eu-north-1.amazonaws.com/pingnew/ping-bold.woff2') format('woff2'); font-weight: 700; }
+        @font-face { font-family: 'Ping'; src: url('https://my-fonts-bucket-results.s3.eu-north-1.amazonaws.com/pingnew/ping-heavy.woff2') format('woff2'); font-weight: 900; }
+
+        :root {
+            --bg: #f4f6fa;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f8f9fc;
+            --border: #e5e7ee;
+            --border-light: #eef0f5;
+            --text: #1a1d2e;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --accent: #4f6ef7;
+            --accent-light: #6b85f9;
+            --accent-bg: rgba(79,110,247,0.08);
+            --green: #10b981; --green-bg: rgba(16,185,129,0.08); --green-light: #d1fae5;
+            --red: #ef4444; --red-bg: rgba(239,68,68,0.08); --red-light: #fee2e2;
+            --orange: #f59e0b; --orange-bg: rgba(245,158,11,0.08);
+            --blue: #3b82f6; --blue-bg: rgba(59,130,246,0.08);
+            --purple: #8b5cf6; --purple-bg: rgba(139,92,246,0.08);
+            --cyan: #06b6d4; --cyan-bg: rgba(6,182,212,0.08);
+            --pink: #ec4899; --pink-bg: rgba(236,72,153,0.08);
+            --gold: #eab308; --gold-bg: rgba(234,179,8,0.08);
+            --radius: 14px;
+            --radius-sm: 8px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+            --shadow: 0 2px 12px rgba(0,0,0,0.06);
+            --shadow-lg: 0 4px 24px rgba(0,0,0,0.08);
+        }
+
+        body.dark {
+            --bg: #0f1117;
+            --bg-card: #1a1d2e;
+            --bg-card-hover: #252838;
+            --border: #2a2d3e;
+            --border-light: #232636;
+            --text: #e5e7ee;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --green-light: rgba(16,185,129,0.15);
+            --red-light: rgba(239,68,68,0.15);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
+            --shadow: 0 2px 12px rgba(0,0,0,0.25);
+            --shadow-lg: 0 4px 24px rgba(0,0,0,0.35);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Ping', 'Heebo', sans-serif; background: var(--bg); color: var(--text); direction: rtl; min-height: 100vh; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+        body.dark ::-webkit-scrollbar-thumb { background: #4a4d5e; }
+
+        /* ── Header ── */
+        .app-header {
+            background: var(--bg-card); border-bottom: 1px solid var(--border);
+            padding: 0 28px; height: 60px; display: flex; align-items: center;
+            justify-content: space-between; position: sticky; top: 0; z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+        .logo { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 700; color: var(--text); }
+        .logo-icon {
+            width: 34px; height: 34px; background: linear-gradient(135deg, var(--accent), #818cf8);
+            border-radius: 9px; display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 800; color: #fff; letter-spacing: -0.5px;
+        }
+        .header-actions { display: flex; align-items: center; gap: 10px; }
+        .btn-icon {
+            width: 36px; height: 36px; border-radius: var(--radius-sm); background: transparent;
+            border: 1px solid var(--border); color: var(--text-secondary); cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 15px; transition: all 0.2s;
+        }
+        .btn-icon:hover { background: var(--bg); border-color: var(--accent); color: var(--accent); }
+        .last-updated { font-size: 11px; color: var(--text-muted); }
+
+        /* ── Sidebar ── */
+        .app-sidebar {
+            position: fixed; right: 0; top: 60px; width: 220px;
+            height: calc(100vh - 60px); background: var(--bg-card);
+            border-left: 1px solid var(--border); z-index: 98;
+            overflow-y: auto; padding: 16px 0; box-shadow: var(--shadow-sm);
+        }
+        .sidebar-item {
+            display: flex; align-items: center; gap: 10px; width: 100%;
+            padding: 12px 20px; border: none; background: transparent;
+            color: var(--text-secondary); font-family: inherit; font-size: 13px;
+            font-weight: 500; cursor: pointer; transition: all 0.15s; text-align: right;
+        }
+        .sidebar-item:hover { background: var(--bg); color: var(--text); }
+        .sidebar-item.active { background: var(--accent-bg); color: var(--accent); font-weight: 600; }
+        .sidebar-icon { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; flex-shrink: 0; }
+
+        /* ── Main Layout ── */
+        .main-content { max-width: 1500px; margin-right: 220px; padding: 24px 28px; min-width: 0; }
+
+        /* ── Filter Bar ── */
+        .filter-bar {
+            background: var(--bg-card); border-bottom: 1px solid var(--border);
+            padding: 10px 28px; display: flex; align-items: center;
+            justify-content: space-between; flex-wrap: wrap; gap: 10px;
+            box-shadow: var(--shadow-sm); position: sticky; top: 60px; z-index: 99;
+            margin-right: 220px;
+        }
+        .filter-bar-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .filter-bar-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .page-title { font-size: 18px; font-weight: 800; }
+
+        .date-presets { display: flex; gap: 2px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 3px; }
+        .date-presets button {
+            padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 500;
+            color: var(--text-secondary); cursor: pointer; transition: all 0.15s;
+            border: none; background: transparent; font-family: inherit; white-space: nowrap;
+        }
+        .date-presets button:hover { color: var(--text); }
+        .date-presets button.active { background: var(--bg-card); color: var(--accent); font-weight: 600; box-shadow: var(--shadow-sm); }
+
+        .date-picker {
+            display: flex; align-items: center; gap: 6px; background: var(--bg);
+            border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 5px 10px;
+        }
+        .date-picker input[type="date"] {
+            background: transparent; border: none; color: var(--text);
+            font-family: inherit; font-size: 12px; direction: ltr;
+        }
+        .date-picker input[type="date"]:focus { outline: none; }
+        .date-picker span { color: var(--text-muted); font-size: 11px; }
+        body.dark .date-picker input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+
+        .filter-select {
+            padding: 5px 28px 5px 10px; background: var(--bg); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); color: var(--text); font-family: inherit;
+            font-size: 12px; font-weight: 500; cursor: pointer;
+            appearance: none; -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239ca3af'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: left 10px center;
+        }
+        .filter-select:focus { outline: none; border-color: var(--accent); }
+
+        .refresh-btn {
+            padding: 6px 12px; background: var(--accent); border: none;
+            border-radius: var(--radius-sm); color: #fff; font-family: inherit;
+            font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .refresh-btn:hover { background: var(--accent-light); }
+
+        /* ── Section ── */
+        .section { margin-bottom: 24px; }
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .section-title { font-size: 15px; font-weight: 700; color: var(--text); }
+        .section-tabs { display: flex; gap: 2px; }
+
+        /* ── KPI Grid ── */
+        .kpi-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+            gap: 12px;
+        }
+        .kpi-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 18px; transition: all 0.2s;
+            box-shadow: var(--shadow-sm);
+        }
+        .kpi-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+        .kpi-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .kpi-icon { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+        .kpi-change {
+            font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 12px;
+            display: flex; align-items: center; gap: 2px;
+        }
+        .kpi-change.up { background: var(--green-light); color: var(--green); }
+        .kpi-change.down { background: var(--red-light); color: var(--red); }
+        .kpi-change.neutral { background: var(--bg); color: var(--text-muted); }
+        .kpi-val { font-size: 26px; font-weight: 800; line-height: 1.2; margin-bottom: 2px; }
+        .kpi-label { font-size: 12px; color: var(--text-secondary); }
+        .kpi-sub { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+
+        /* ── Funnel ── */
+        .funnel-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-sm);
+        }
+        .funnel-steps { display: flex; align-items: flex-end; justify-content: center; gap: 0; }
+        .funnel-step { display: flex; flex-direction: column; align-items: center; padding: 0 16px; min-width: 110px; }
+        .funnel-bar {
+            width: 100%; border-radius: 8px 8px 0 0; display: flex; align-items: center;
+            justify-content: center; font-size: 22px; font-weight: 800; color: #fff;
+            transition: height 0.6s ease; min-height: 40px;
+        }
+        .funnel-label { margin-top: 10px; font-size: 12px; font-weight: 600; color: var(--text-secondary); text-align: center; }
+        .funnel-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+        .funnel-arrow {
+            display: flex; flex-direction: column; align-items: center;
+            padding: 0 4px; color: var(--text-muted); margin-bottom: 28px;
+        }
+        .funnel-arrow .arr { font-size: 18px; }
+        .funnel-arrow .pct { font-size: 12px; font-weight: 700; color: var(--accent); }
+
+        /* ── Branch Cards ── */
+        .branch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+        .branch-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow-sm);
+            transition: all 0.2s;
+        }
+        .branch-card:hover { box-shadow: var(--shadow); }
+        .branch-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        .branch-name { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .branch-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .branch-lead-count { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+        .branch-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+        .bm-val { font-size: 20px; font-weight: 800; }
+        .bm-label { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+        .branch-bar { height: 5px; background: var(--bg); border-radius: 3px; margin-top: 14px; overflow: hidden; display: flex; }
+        .branch-bar > div { height: 100%; }
+
+        /* ── Charts ── */
+        .charts-row { display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px; }
+        .chart-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow-sm);
+        }
+        .chart-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .chart-title { font-size: 14px; font-weight: 600; }
+        .chart-tabs { display: flex; gap: 2px; background: var(--bg); border-radius: 6px; padding: 2px; }
+        .chart-tab {
+            padding: 4px 10px; border-radius: 5px; font-size: 11px; font-weight: 500;
+            color: var(--text-muted); cursor: pointer; border: none; background: transparent;
+            font-family: inherit; transition: all 0.15s;
+        }
+        .chart-tab:hover { color: var(--text); }
+        .chart-tab.active { background: var(--bg-card); color: var(--accent); font-weight: 600; box-shadow: var(--shadow-sm); }
+        .chart-container { position: relative; height: 260px; }
+
+        /* ── Lists ── */
+        .list-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow-sm);
+        }
+        .list-item {
+            display: flex; align-items: center; gap: 10px; padding: 9px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .list-item:last-child { border-bottom: none; }
+        .list-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .list-name { flex: 1; font-size: 13px; font-weight: 500; }
+        .list-count { font-size: 13px; font-weight: 700; min-width: 28px; text-align: left; }
+        .list-pct { font-size: 11px; color: var(--text-muted); min-width: 36px; text-align: left; }
+        .list-bar { width: 80px; height: 4px; background: var(--bg); border-radius: 2px; overflow: hidden; }
+        .list-bar-fill { height: 100%; border-radius: 2px; }
+
+        /* ── Table ── */
+        .table-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow-sm); }
+        .table-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+        .table-filters { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+        .table-search {
+            padding: 7px 12px; background: var(--bg); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); color: var(--text); font-family: inherit;
+            font-size: 12px; width: 180px; direction: rtl;
+        }
+        .table-search:focus { outline: none; border-color: var(--accent); }
+        .fbtn {
+            padding: 6px 12px; background: var(--bg); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); color: var(--text-secondary); font-family: inherit;
+            font-size: 11px; cursor: pointer; transition: all 0.15s;
+        }
+        .fbtn:hover { border-color: var(--accent); color: var(--text); }
+        .fbtn.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+        table { width: 100%; border-collapse: collapse; }
+        thead th { text-align: right; padding: 10px 10px; font-size: 11px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border); }
+        tbody td { padding: 9px 10px; font-size: 12px; border-bottom: 1px solid var(--border-light); }
+        tbody tr:hover { background: var(--bg); }
+        tbody tr:last-child td { border-bottom: none; }
+
+        .badge { padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; white-space: nowrap; }
+        .badge-green { background: var(--green-bg); color: var(--green); }
+        .badge-red { background: var(--red-bg); color: var(--red); }
+        .badge-blue { background: var(--blue-bg); color: var(--blue); }
+        .badge-orange { background: var(--orange-bg); color: var(--orange); }
+        .badge-purple { background: var(--purple-bg); color: var(--purple); }
+        .badge-gold { background: var(--gold-bg); color: var(--gold); }
+        .badge-pink { background: var(--pink-bg); color: var(--pink); }
+        .badge-gray { background: var(--bg); color: var(--text-muted); }
+
+        .pagination { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 14px; }
+        .pagination button { padding: 6px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text-secondary); font-family: inherit; font-size: 11px; cursor: pointer; }
+        .pagination button:hover { border-color: var(--accent); }
+        .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .pagination .page-info { font-size: 11px; color: var(--text-muted); }
+
+        /* ── Loading / Skeleton ── */
+        .loading-overlay { position: fixed; inset: 0; background: rgba(244,246,250,0.92); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 500; gap: 16px; transition: opacity 0.3s; backdrop-filter: blur(4px); }
+        body.dark .loading-overlay { background: rgba(15,17,23,0.92); }
+        .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+        .spinner { width: 38px; height: 38px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { color: var(--text-secondary); font-size: 13px; }
+        .loading-bar-wrap { width: 200px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+        .loading-bar { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s; width: 0%; }
+        .skeleton-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap: 12px; padding: 24px 28px; max-width: 1200px; }
+        .skeleton-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+        .skeleton-line { height: 14px; background: linear-gradient(90deg, var(--border) 25%, var(--bg) 50%, var(--border) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 6px; margin-bottom: 10px; }
+        .skeleton-line.w60 { width: 60%; }
+        .skeleton-line.w40 { width: 40%; }
+        .skeleton-line.w80 { width: 80%; }
+        .skeleton-line.thick { height: 28px; margin-bottom: 12px; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        /* ── Export ── */
+        .export-btn {
+            padding: 6px 14px; background: var(--bg); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); color: var(--text-secondary); font-family: inherit;
+            font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s;
+            display: inline-flex; align-items: center; gap: 5px;
+        }
+        .export-btn:hover { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+
+        /* ── Empty State ── */
+        .empty-state-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 48px 24px; text-align: center; box-shadow: var(--shadow-sm);
+        }
+        .empty-state-icon { margin: 0 auto 14px; color: var(--text-muted); opacity: 0.5; }
+        .empty-state-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+        .empty-state-sub { font-size: 13px; color: var(--text-muted); }
+
+        .toast-container { position: fixed; bottom: 20px; left: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 6px; }
+        .toast { padding: 10px 18px; border-radius: var(--radius-sm); font-size: 13px; animation: toastIn 0.3s ease; box-shadow: var(--shadow-lg); }
+        .toast.error { background: var(--red); color: #fff; }
+        .toast.success { background: var(--green); color: #fff; }
+        .toast.info { background: var(--accent); color: #fff; }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ── Target Gauge ── */
+        .target-gauge { margin-top: 8px; }
+        .target-bar-wrap { height: 6px; background: var(--bg); border-radius: 3px; overflow: visible; position: relative; }
+        .target-bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+        .target-marker {
+            position: absolute; top: -3px; width: 2px; height: 12px;
+            background: var(--text); border-radius: 1px; transform: translateX(-50%);
+        }
+        .target-labels { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+        .target-label { font-size: 9px; color: var(--text-muted); }
+        .target-status { font-size: 10px; font-weight: 700; }
+        .target-status.hit { color: var(--green); }
+        .target-status.miss { color: var(--red); }
+
+        /* ── Sortable ── */
+        .sortable { cursor: pointer; user-select: none; white-space: nowrap; transition: color 0.15s; }
+        .sortable:hover { color: var(--accent); }
+        .sort-arrow { font-size: 10px; margin-right: 2px; opacity: 0.4; }
+        .sortable.active .sort-arrow { opacity: 1; color: var(--accent); }
+
+        /* ── Heatmap ── */
+        .heatmap-table { border-collapse: collapse; width: 100%; }
+        .heatmap-table th { font-size: 10px; font-weight: 600; color: var(--text-muted); padding: 4px 2px; text-align: center; }
+        .heatmap-table td { text-align: center; font-size: 10px; font-weight: 600; padding: 0; }
+        .hm-cell { width: 100%; aspect-ratio: 1.6; display: flex; align-items: center; justify-content: center; border-radius: 3px; min-width: 28px; min-height: 24px; transition: transform 0.1s; cursor: default; }
+        .hm-cell:hover { transform: scale(1.2); z-index: 2; position: relative; }
+
+        /* ── Audio ── */
+        .audio-btn { background: var(--accent-bg); border: 1px solid var(--accent); border-radius: 6px; color: var(--accent); cursor: pointer; padding: 3px 8px; font-size: 11px; font-family: inherit; display: inline-flex; align-items: center; gap: 4px; transition: all 0.15s; }
+        .audio-btn:hover { background: var(--accent); color: #fff; }
+        .audio-player { margin-top: 4px; }
+        .audio-player audio { height: 28px; width: 220px; }
+
+        @media (max-width: 1100px) { .charts-row { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) {
+            .app-header { padding: 0 14px; height: 52px; }
+            .logo { font-size: 14px; gap: 8px; }
+            .logo-icon { width: 28px; height: 28px; font-size: 10px; }
+            .header-actions { gap: 6px; }
+            .btn-icon { width: 30px; height: 30px; }
+            .main-content { padding: 14px 10px; margin-right: 0 !important; }
+            .filter-bar { margin-right: 0 !important; padding: 8px 10px; top: 52px; flex-direction: column; gap: 8px; align-items: stretch; }
+            .filter-bar-right { flex-wrap: wrap; justify-content: center; }
+            .filter-bar-left { flex-wrap: wrap; justify-content: center; }
+            .page-title { font-size: 14px; text-align: center; width: 100%; }
+            .filter-select { font-size: 11px; flex: 1; min-width: 100px; }
+            .date-presets { flex-wrap: wrap; justify-content: center; }
+            .date-presets button { font-size: 10px; padding: 4px 8px; }
+            .date-picker { font-size: 11px; }
+            .date-picker input[type="date"] { font-size: 11px; width: 95px; }
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .kpi-card { padding: 14px; }
+            .kpi-val { font-size: 20px; }
+            .kpi-label { font-size: 11px; }
+            .kpi-icon { width: 28px; height: 28px; border-radius: 7px; }
+            .branch-grid { grid-template-columns: 1fr; }
+            .chart-card { padding: 14px; }
+            .chart-container { height: 220px !important; }
+            .funnel-steps { flex-direction: column; align-items: center; }
+            .funnel-arrow { transform: rotate(90deg); }
+            .funnel-step { min-width: 80px; padding: 0 8px; }
+            .funnel-bar { font-size: 16px; }
+            .funnel-label { font-size: 11px; }
+            .table-card { padding: 12px; }
+            .table-top { flex-direction: column; }
+            .table-filters { flex-wrap: wrap; }
+            .table-search { width: 100%; }
+            thead th { font-size: 10px; padding: 6px 4px; }
+            tbody td { font-size: 11px; padding: 6px 4px; }
+            .heatmap-table th, .heatmap-table td { font-size: 8px; }
+            .hm-cell { min-width: 18px; min-height: 18px; font-size: 8px; }
+            .skeleton-grid { grid-template-columns: repeat(2, 1fr); padding: 14px 10px; }
+            .export-btn { font-size: 10px; padding: 4px 10px; }
+            .refresh-btn { font-size: 10px; padding: 4px 10px; }
+            .app-sidebar {
+                position: sticky; top: auto; right: auto; width: 100%;
+                height: auto; display: flex; overflow-x: auto; padding: 6px 10px;
+                gap: 2px; border-left: none; border-bottom: 1px solid var(--border);
+                z-index: 97; -webkit-overflow-scrolling: touch;
+            }
+            .sidebar-item { white-space: nowrap; padding: 7px 12px; font-size: 11px; gap: 6px; }
+            .sidebar-icon { width: 16px; height: 16px; }
+        }
+        @media (max-width: 480px) {
+            .kpi-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+            .kpi-card { padding: 12px; }
+            .kpi-val { font-size: 18px; }
+            .logo span { display: none; }
+            #userBadge { display: none !important; }
+            .branch-metrics { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+<script>if(localStorage.getItem('darkMode')==='1')document.body.classList.add('dark');</script>
+
+<div class="loading-overlay hidden" id="lo">
+    <div class="spinner"></div>
+    <div class="loading-text" id="lt">טוען נתונים...</div>
+    <div class="loading-bar-wrap"><div class="loading-bar" id="lb"></div></div>
+    <div class="skeleton-grid" id="skelGrid">
+        <div class="skeleton-card"><div class="skeleton-line thick w60"></div><div class="skeleton-line w40"></div></div>
+        <div class="skeleton-card"><div class="skeleton-line thick w60"></div><div class="skeleton-line w40"></div></div>
+        <div class="skeleton-card"><div class="skeleton-line thick w60"></div><div class="skeleton-line w40"></div></div>
+        <div class="skeleton-card"><div class="skeleton-line thick w60"></div><div class="skeleton-line w40"></div></div>
+        <div class="skeleton-card"><div class="skeleton-line thick w80"></div><div class="skeleton-line w60"></div></div>
+        <div class="skeleton-card"><div class="skeleton-line thick w80"></div><div class="skeleton-line w60"></div></div>
+    </div>
+</div>
+
+<header class="app-header">
+    <div class="logo"><div class="logo-icon">TB</div>True Beauty — דאשבורד שיווק</div>
+    <div class="header-actions">
+        <span class="last-updated" id="lastUp"></span>
+        <span style="font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:4px" id="userBadge"></span>
+        <button class="btn-icon" onclick="toggleDark()" title="מצב כהה" id="darkBtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></button>
+        <button class="btn-icon" onclick="refreshData()" title="רענון"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg></button>
+        <a href="/admin.html" class="btn-icon" title="ניהול" id="adminLink" style="display:none;text-decoration:none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2z"/><circle cx="12" cy="12" r="3"/></svg></a>
+        <button class="btn-icon" onclick="doLogout()" title="התנתק"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
+    </div>
+</header>
+
+<nav class="app-sidebar" id="sidebar">
+    <button class="sidebar-item active" onclick="setView('overview')" data-view="overview">
+        <span class="sidebar-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+        <span>סקירה</span>
+    </button>
+    <button class="sidebar-item" onclick="setView('funnel')" data-view="funnel">
+        <span class="sidebar-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></span>
+        <span>משפך</span>
+    </button>
+    <button class="sidebar-item" onclick="setView('branches')" data-view="branches">
+        <span class="sidebar-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4M8 6h.01M16 6h.01M12 6h.01M8 10h.01M16 10h.01M12 10h.01M8 14h.01M16 14h.01M12 14h.01"/></svg></span>
+        <span>סניפים</span>
+    </button>
+    <button class="sidebar-item" onclick="setView('channels')" data-view="channels">
+        <span class="sidebar-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.4"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.4"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg></span>
+        <span>ערוצים</span>
+    </button>
+    <button class="sidebar-item" onclick="setView('campaigns')" data-view="campaigns">
+        <span class="sidebar-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+        <span>קמפיינים</span>
+    </button>
+    <button class="sidebar-item" onclick="setView('leads')" data-view="leads">
+        <span class="sidebar-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg></span>
+        <span>לידים</span>
+    </button>
+</nav>
+
+<div class="filter-bar">
+    <div class="filter-bar-right">
+        <div class="page-title" id="pageTitle">סקירה שיווקית</div>
+        <select class="filter-select" id="branchSelect" onchange="setBranchFilter(this.value)">
+            <option value="">כל הסניפים ▾</option>
+            <option value="סניף ראשל״צ">סניף ראשל״צ</option>
+            <option value="סניף אשדוד">סניף אשדוד</option>
+            <option value="סניף נתניה">סניף נתניה</option>
+            <option value="סניף ירושלים">סניף ירושלים</option>
+        </select>
+        <select class="filter-select" id="channelSelect" onchange="setChannelFilter(this.value)">
+            <option value="">כל המקורות ▾</option>
+            <option value="Google Ads">Google Ads</option>
+            <option value="Facebook Ads">Facebook Ads</option>
+            <option value="Google My Business">Google My Business</option>
+            <option value="תוסף שיחות Google">תוסף שיחות Google</option>
+            <option value="אורגני / ישיר">אורגני / ישיר</option>
+        </select>
+    </div>
+    <div class="filter-bar-left">
+        <div class="date-picker">
+            <input type="date" id="dateFrom"><span>—</span><input type="date" id="dateTo">
+        </div>
+        <div class="date-presets">
+            <button onclick="setDP('today')" data-dp="today">היום</button>
+            <button onclick="setDP('yesterday')" data-dp="yesterday">אתמול</button>
+            <button onclick="setDP('7days')" data-dp="7days">7 ימים</button>
+            <button onclick="setDP('30days')" data-dp="30days">30 יום</button>
+            <button onclick="setDP('thisMonth')" data-dp="thisMonth" class="active">החודש</button>
+            <button onclick="setDP('lastMonth')" data-dp="lastMonth">חודש שעבר</button>
+            <button onclick="setDP('thisYear')" data-dp="thisYear">השנה</button>
+        </div>
+        <button class="export-btn" onclick="exportExcel()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> Excel</button>
+        <button class="refresh-btn" onclick="refreshData()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg> רענן</button>
+    </div>
+</div>
+
+<main class="main-content">
+    <div id="content"></div>
+</main>
+
+<div class="toast-container" id="tc"></div>
+
+<script>
+const S = { dateFrom:null, dateTo:null, allCalls:[], prevCalls:[], charts:{}, view:'overview', branchFilter:'', channelFilter:'', tableFilter:'all', tableSearch:'', tablePage:1 };
+
+const CH = {
+    'google adwords':{n:'Google Ads',c:'#4285f4'},'google ads':{n:'Google Ads',c:'#4285f4'},
+    'facebook lead ads':{n:'Facebook Ads',c:'#1877f2'},'facebook':{n:'Facebook Ads',c:'#1877f2'},
+    'google my business':{n:'Google My Business',c:'#34a853'},
+    'ad extension':{n:'תוסף שיחות Google',c:'#fbbc04'},
+    'direct or unknown':{n:'אורגני / ישיר',c:'#8b5cf6'},
+};
+const BC = ['#4f6ef7','#10b981','#f59e0b','#ec4899','#06b6d4','#8b5cf6'];
+const TARGETS = { meetRate:50, arrRate:30, dealRate:40 };
+const IC = {
+    leads:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg>',
+    phone:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>',
+    form:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>',
+    check:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>',
+    xmark:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>',
+    user:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+    calendar:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+    building:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4M8 6h.01M16 6h.01M12 6h.01M8 10h.01M16 10h.01M12 10h.01M8 14h.01M16 14h.01M12 14h.01"/></svg>',
+    money:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>',
+    wallet:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><circle cx="16" cy="15" r="1"/></svg>',
+    broadcast:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.4"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.4"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>',
+    campaign:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>',
+};
+const CRMM = {
+    'נקבעה פגישה':{c:'#10b981',b:'badge-green',o:1},'הגיע לפגישה':{c:'#eab308',b:'badge-gold',o:2},
+    'אין מענה':{c:'#f59e0b',b:'badge-orange',o:3},'לחזור לליד':{c:'#3b82f6',b:'badge-blue',o:4},
+    'במועד מרוחק':{c:'#8b5cf6',b:'badge-purple',o:5},'ליד לא תקין':{c:'#ef4444',b:'badge-red',o:6},
+    'הגיע וקיבל הצעה':{c:'#06b6d4',b:'badge-blue',o:2.5},'נסגרה עסקה':{c:'#059669',b:'badge-green',o:0.5},
+    'פגישה בוטלה':{c:'#dc2626',b:'badge-red',o:5.5},'אי הופעה':{c:'#9333ea',b:'badge-purple',o:5.6},
+};
+
+function nb(c){const cf=c.custom_fields||{};let b=(cf.branch||'').trim();if(!b)b=(c.business_label||'').trim();if(!b)return 'סניף ראשל״צ';const l=b.toLowerCase();if(l.includes('rishon')||b.includes('ראשל')||b.includes('רשל'))return 'סניף ראשל״צ';if(l.includes('ashdod')||b.includes('אשדוד'))return 'סניף אשדוד';if(l.includes('netanya')||b.includes('נתניה'))return 'סניף נתניה';if(l.includes('jerusalem')||b.includes('ירושלים'))return 'סניף ירושלים';return 'סניף ראשל״צ';}
+function crm(c){
+    let s=((c.custom_fields||{}).crm_status||'').replace(/\uFFFD/g,'');
+    if(!s)return '';
+    if(s.includes('אין מ')&&s.includes('נה'))return 'אין מענה';
+    if(s.includes('לי')&&s.includes('לא תקין'))return 'ליד לא תקין';
+    if(s.includes('נקבעה'))return 'נקבעה פגישה';
+    if(s.includes('הגיע לפגישה'))return 'הגיע לפגישה';
+    if(s.includes('הגיע וקיבל'))return 'הגיע וקיבל הצעה';
+    if(s.includes('לחזור'))return 'לחזור לליד';
+    if(s.includes('במועד'))return 'במועד מרוחק';
+    if(s.includes('בוטלה'))return 'פגישה בוטלה';
+    if(s.includes('אי הופעה'))return 'אי הופעה';
+    if(s.includes('נסגרה'))return 'נסגרה עסקה';
+    return s;
+}
+function da(c){return parseFloat((c.custom_fields||{}).deal_amount||'0')||0;}
+function dp(c){return parseFloat((c.custom_fields||{}).deal_paid||'0')||0;}
+const MEET_S=['נקבעה פגישה','הגיע לפגישה','הגיע וקיבל הצעה','נסגרה עסקה','פגישה בוטלה','אי הופעה'];
+const ARR_S=['הגיע לפגישה','הגיע וקיבל הצעה','נסגרה עסקה'];
+function isMeet(c){return MEET_S.includes(crm(c));}
+function isArr(c){return ARR_S.includes(crm(c));}
+function isF(c){return c.direction==='form';}
+function isC(c){return c.direction==='inbound'||c.direction==='outbound';}
+function isA(c){return!isF(c)&&(c.dial_status==='completed'||(c.talk_time&&c.talk_time>0));}
+function isM(c){return!isF(c)&&(c.dial_status==='no-answer'||c.dial_status==='missed');}
+function gCh(c){const t=(c.tag_list||[]).map(x=>x.toLowerCase());for(const[k,v]of Object.entries(CH)){if(t.some(x=>x.includes(k)))return v;}const s=(c.source||'').toLowerCase();for(const[k,v]of Object.entries(CH)){if(s.includes(k))return v;}return{n:c.source||c.tracking_label||'לא ידוע',c:'#9ca3af'};}
+function pd(s){if(!s)return null;try{return new Date(s);}catch{return null;}}
+function fc(){let list=S.allCalls;if(S.branchFilter)list=list.filter(c=>nb(c)===S.branchFilter);if(S.channelFilter)list=list.filter(c=>gCh(c).n===S.channelFilter);return list;}
+
+function getCN(c){const f=c.form||{};const cf=c.custom_fields||{};return f.campaign_name||cf.campaign_name||c.campaign_name||c.tracking_label||'';}
+function getPL(c){const f=c.form||{};const cf=c.custom_fields||{};return f.platform||cf.platform||c.platform||'';}
+
+function isDark(){return document.body.classList.contains('dark');}
+function toggleDark(){
+    document.body.classList.toggle('dark');
+    localStorage.setItem('darkMode',isDark()?'1':'0');
+    updateDarkBtn();
+    render();
+}
+function updateDarkBtn(){
+    const btn=_('darkBtn');if(!btn)return;
+    btn.innerHTML=isDark()
+        ?'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'
+        :'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>';
+}
+
+let USER_ROLE='', USER_BRANCH='';
+async function checkAuth(){
+    try{const r=await fetch('/auth/me');const d=await r.json();
+        if(!d.role){window.location.href='/login.html';return false;}
+        USER_ROLE=d.role;USER_BRANCH=d.branch||'';
+        const ub=document.getElementById('userBadge');
+        if(ub)ub.textContent=d.name||'';
+        if(d.role==='admin'){const al=document.getElementById('adminLink');if(al)al.style.display='flex';}
+        if(d.role==='branch'&&d.branch){
+            S.branchFilter=d.branch;
+            const bs=document.getElementById('branchSelect');if(bs)bs.style.display='none';
+        }
+        return true;
+    }catch{window.location.href='/login.html';return false;}
+}
+async function doLogout(){await fetch('/auth/logout');window.location.href='/login.html';}
+
+document.addEventListener('DOMContentLoaded',async()=>{
+    updateDarkBtn();
+    const ok=await checkAuth();
+    if(!ok)return;
+    setDP('thisMonth');
+});
+
+async function api(ep){
+    const ctrl=new AbortController();const tid=setTimeout(()=>ctrl.abort(),15000);
+    try{const r=await fetch(`/api${ep}`,{signal:ctrl.signal});clearTimeout(tid);if(!r.ok)throw new Error(`HTTP ${r.status}`);return r.json();}
+    catch(e){clearTimeout(tid);if(e.name==='AbortError')throw new Error('Timeout - השרת לא מגיב');throw e;}
+}
+
+async function fetchRange(sd,ed,label){
+    let calls=[],p=1,tp=1,af=null;const MAX_PAGES=50;
+    const lo=_('lo'),lt=_('lt'),lb=_('lb');
+    while(p<=tp&&p<=MAX_PAGES){
+        if(lt)lt.textContent=`${label} ${p}${tp>1?`/${Math.min(tp,MAX_PAGES)}`:''}...`;
+        if(lb)lb.style.width=tp>1?`${(p/Math.min(tp,MAX_PAGES))*100}%`:'50%';
+        let u=`/calls.json?per_page=150&start_date=${sd}&end_date=${ed}`;
+        if(af)u+=`&after=${af}`;else if(p>1)u+=`&page=${p}`;
+        const d=await api(u);const cs=d.calls||[];calls=calls.concat(cs);tp=d.total_pages||1;
+        if(d.next_page){try{af=new URL(d.next_page).searchParams.get('after');}catch{af=null;}}else af=null;
+        if(!cs.length||p>=tp)break;p++;
+    }
+    return calls;
+}
+
+function getPrevPeriod(){
+    const ms=S.dateTo.getTime()-S.dateFrom.getTime();
+    const pTo=new Date(S.dateFrom.getTime()-86400000);
+    const pFrom=new Date(pTo.getTime()-ms);
+    return {from:pFrom,to:pTo};
+}
+
+async function fetchAll(){
+    S.allCalls=[];S.prevCalls=[];
+    const lo=_('lo');lo.classList.remove('hidden');
+    const sd=fd(S.dateFrom),ed=fd(S.dateTo);
+    const prev=getPrevPeriod();
+    try{
+        const [cur,prv]=await Promise.all([
+            fetchRange(sd,ed,'טוען'),
+            fetchRange(fd(prev.from),fd(prev.to),'טוען תקופה קודמת')
+        ]);
+        S.allCalls=cur;S.prevCalls=prv;
+    }catch(e){console.error('fetchAll error:',e);toast(`שגיאה: ${e.message}`,'error');}
+    const lb=_('lb');if(lb)lb.style.width='100%';
+    setTimeout(()=>lo.classList.add('hidden'),300);
+    return S.allCalls;
+}
+
+async function refreshData(){
+    try{
+        await fetchAll();
+        render();
+        _('lastUp').textContent=`עדכון: ${new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})}`;
+        toast(`נטענו ${S.allCalls.length} לידים`,'success');
+    }catch(e){
+        console.error('refreshData error:',e);
+        _('lo').classList.add('hidden');
+        toast(`שגיאה: ${e.message}`,'error');
+    }
+}
+
+function setView(v){
+    S.view=v;
+    document.querySelectorAll('.sidebar-item').forEach(x=>x.classList.toggle('active',x.dataset.view===v));
+    updateTitle();
+    render();
+}
+
+function setBranchFilter(b){
+    S.branchFilter=b;
+    updateTitle();
+    render();
+}
+
+function setChannelFilter(ch){
+    S.channelFilter=ch;
+    updateTitle();
+    render();
+}
+
+function updateTitle(){
+    const titles={'overview':'סקירה שיווקית','funnel':'מדדי משפך','branches':'ביצועים לפי סניף','channels':'ביצועים לפי ערוץ','campaigns':'ביצועים לפי קמפיין','leads':'רשימת לידים'};
+    let t=titles[S.view]||'סקירה שיווקית';
+    const filters=[];
+    if(S.branchFilter)filters.push(S.branchFilter);
+    if(S.channelFilter)filters.push(S.channelFilter);
+    if(filters.length)t=filters.join(' • ')+' — '+t;
+    _('pageTitle').textContent=t;
+}
+
+function render(){
+    try{
+        const calls=fc();
+        Object.values(S.charts).forEach(c=>{if(c&&c.destroy)c.destroy();});S.charts={};
+        if(!calls.length&&S.allCalls.length>0){
+            _('content').innerHTML=emptyState('אין נתונים לתצוגה הנוכחית','נסה לשנות את הסניף, ערוץ השיווק או טווח התאריכים');
+            return;
+        }
+        if(!calls.length){
+            _('content').innerHTML=emptyState('טרם נטענו נתונים','לחץ על "רענן" או בחר טווח תאריכים');
+            return;
+        }
+        const v=S.view;
+        if(v==='overview')renderOverview(calls);
+        else if(v==='funnel')renderFunnelView(calls);
+        else if(v==='branches')renderBranchesView(calls);
+        else if(v==='channels')renderChannelsView(calls);
+        else if(v==='campaigns')renderCampaignsView(calls);
+        else if(v==='leads')renderLeadsView(calls);
+    }catch(e){
+        console.error('render error:',e);
+        _('lo').classList.add('hidden');
+        toast(`שגיאת רינדור: ${e.message}`,'error');
+    }
+}
+
+function delta(cur,prev){
+    if(prev===0)return cur>0?{pct:100,cls:'up'}:{pct:0,cls:'neutral'};
+    const p=Math.round(((cur-prev)/prev)*100);
+    return{pct:Math.abs(p),cls:p>0?'up':p<0?'down':'neutral'};
+}
+function deltaHtml(cur,prev,invert){
+    const d=delta(cur,prev);if(d.cls==='neutral')return'';
+    const cls=invert?(d.cls==='up'?'down':'up'):d.cls;
+    const arrow=d.cls==='up'?'↑':'↓';
+    return`<div class="kpi-change ${cls}">${arrow} ${d.pct}%</div>`;
+}
+
+function targetGauge(actual,target,label){
+    const pct=Math.min(actual,100);
+    const hit=actual>=target;
+    const fillW=Math.min(pct/Math.max(target*1.3,100)*100,100);
+    const markerPos=Math.min(target/Math.max(target*1.3,100)*100,98);
+    const color=hit?'var(--green)':'var(--red)';
+    return`<div class="target-gauge"><div class="target-bar-wrap"><div class="target-bar-fill" style="width:${fillW}%;background:${color}"></div><div class="target-marker" style="right:auto;left:${100-markerPos}%" title="יעד: ${target}%"></div></div><div class="target-labels"><span class="target-status ${hit?'hit':'miss'}">${actual}% ${hit?'✓':'✗'}</span><span class="target-label">יעד: ${target}%</span></div></div>`;
+}
+
+function renderOverview(calls){
+    const pv=S.prevCalls.filter(c=>{if(S.branchFilter&&nb(c)!==S.branchFilter)return false;if(S.channelFilter&&gCh(c).n!==S.channelFilter)return false;return true;});
+    const t=calls.length,ph=calls.filter(isC),fm=calls.filter(isF),an=calls.filter(isA),mi=calls.filter(isM);
+    const nw=calls.filter(c=>c.is_new_caller),mt=calls.filter(isMeet);
+    const ar=calls.filter(isArr),dl=calls.filter(c=>da(c)>0);
+    const tr=calls.reduce((s,c)=>s+da(c),0),tpd=calls.reduce((s,c)=>s+dp(c),0);
+
+    const pt=pv.length,pph=pv.filter(isC).length,pfm=pv.filter(isF).length,pan=pv.filter(isA).length,pmi=pv.filter(isM).length;
+    const pnw=pv.filter(c=>c.is_new_caller).length,pmt=pv.filter(isMeet).length;
+    const par=pv.filter(isArr).length,pdl=pv.filter(c=>da(c)>0).length;
+    const ptr=pv.reduce((s,c)=>s+da(c),0),ppd=pv.reduce((s,c)=>s+dp(c),0);
+
+    const days=Math.max(1,Math.round((S.dateTo-S.dateFrom)/(1000*60*60*24))+1);
+    const dailyAvg=Math.round(t/days*10)/10;
+    const convRate=t>0?Math.round((mt.length/t)*1000)/10:0;
+    const arrRate=mt.length>0?Math.round((ar.length/mt.length)*1000)/10:0;
+    const dealRate=t>0?Math.round((dl.length/t)*1000)/10:0;
+    const ansRate=ph.length>0?Math.round((an.length/ph.length)*1000)/10:0;
+
+    let h=`<div class="section"><div class="section-header"><div class="section-title">מדדי ביצוע מרכזיים</div></div><div class="kpi-grid">`;
+    const kpis=[
+        {icon:IC.leads,bg:'var(--blue-bg)',color:'var(--blue)',val:t,pv:pt,label:'סה"כ לידים',sub:`ממוצע ${dailyAvg} ליום`,click:'all'},
+        {icon:IC.phone,bg:'var(--cyan-bg)',color:'var(--cyan)',val:ph.length,pv:pph,label:'שיחות טלפון',sub:pct(ph.length,t),click:'call'},
+        {icon:IC.form,bg:'var(--pink-bg)',color:'var(--pink)',val:fm.length,pv:pfm,label:'טפסים',sub:pct(fm.length,t),click:'form'},
+        {icon:IC.check,bg:'var(--green-bg)',color:'var(--green)',val:an.length,pv:pan,label:'שיחות שנענו',sub:`${ansRate}% מענה`},
+        {icon:IC.xmark,bg:'var(--red-bg)',color:'var(--red)',val:mi.length,pv:pmi,label:'לא נענו',sub:pct(mi.length,Math.max(ph.length,1)),inv:1,click:'noanswer'},
+        {icon:IC.user,bg:'var(--orange-bg)',color:'var(--orange)',val:nw.length,pv:pnw,label:'לידים חדשים',sub:pct(nw.length,t)},
+        {icon:IC.calendar,bg:'var(--green-bg)',color:'var(--green)',val:mt.length,pv:pmt,label:'פגישות שנקבעו',sub:`${convRate}% מלידים`,tg:targetGauge(convRate,TARGETS.meetRate,'תיאום'),click:'meeting'},
+        {icon:IC.building,bg:'var(--gold-bg)',color:'var(--gold)',val:ar.length,pv:par,label:'הגיעו לפגישה',sub:`${arrRate}% מפגישות`,tg:targetGauge(arrRate,TARGETS.arrRate,'הגעה'),click:'arrived'},
+        {icon:IC.money,bg:'var(--purple-bg)',color:'var(--purple)',val:dl.length,pv:pdl,label:'עסקאות',sub:dl.length?`ממוצע ₪${Math.round(tr/dl.length).toLocaleString('he-IL')} · ${dealRate}% המרה`:'',tg:dl.length||ar.length?targetGauge(ar.length>0?Math.round((dl.length/ar.length)*1000)/10:0,TARGETS.dealRate,'עסקה'):null,click:'deal'},
+        {icon:IC.money,bg:'var(--purple-bg)',color:'var(--purple)',val:'₪'+tr.toLocaleString('he-IL'),pv:ptr,rv:tr,label:'מחזור עסקאות',sub:'',na:1},
+        {icon:IC.wallet,bg:'var(--green-bg)',color:'var(--green)',val:'₪'+tpd.toLocaleString('he-IL'),pv:ppd,rv:tpd,label:'שולם בפועל',sub:tr>0?Math.round((tpd/tr)*100)+'% גבייה':'',na:1},
+    ];
+    kpis.forEach(k=>{
+        const dh=deltaHtml(k.na?k.rv:k.val,k.pv,k.inv);
+        const clickAttr=k.click?` onclick="drillDown('${k.click}')" style="cursor:pointer"`:'';;
+        const drillHint=k.click?`<div style="margin-top:6px;font-size:10px;color:var(--accent);opacity:0.7;display:flex;align-items:center;gap:3px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg> לחץ לפירוט</div>`:'';;
+        h+=`<div class="kpi-card"${clickAttr}><div class="kpi-top"><div class="kpi-icon" style="background:${k.bg};color:${k.color}">${k.icon}</div>${dh}</div><div class="kpi-val">${k.na?k.val:'—'}</div><div class="kpi-label">${k.label}</div>${k.sub?`<div class="kpi-sub">${k.sub}</div>`:''}${k.tg||''}${drillHint}</div>`;
+    });
+    h+=`</div></div>`;
+
+    const brData={};
+    calls.forEach(c=>{const b=nb(c);if(!b)return;if(!brData[b])brData[b]={leads:0,meetings:0,arrived:0,deals:0,rev:0};const d=brData[b];d.leads++;if(isMeet(c))d.meetings++;if(isArr(c))d.arrived++;const a=da(c);if(a>0){d.deals++;d.rev+=a;}});
+    const brSorted=Object.entries(brData).sort((a,b)=>b[1].leads-a[1].leads);
+    if(brSorted.length>1){
+        h+=`<div class="section"><div class="section-header"><div class="section-title">דירוג סניפים</div></div><div class="table-card"><table id="branchTable"><thead><tr>`;
+        h+=`<th>#</th>`;
+        h+=`<th class="sortable" onclick="sortTable('branchTable',1,'text',this)"><span class="sort-arrow">↕</span>סניף</th>`;
+        h+=`<th class="sortable active" onclick="sortTable('branchTable',2,'num',this)"><span class="sort-arrow">↓</span>לידים</th>`;
+        h+=`<th class="sortable" onclick="sortTable('branchTable',3,'num',this)"><span class="sort-arrow">↕</span>ליום</th>`;
+        h+=`<th class="sortable" onclick="sortTable('branchTable',4,'num',this)"><span class="sort-arrow">↕</span>פגישות</th>`;
+        h+=`<th class="sortable" onclick="sortTable('branchTable',5,'num',this)"><span class="sort-arrow">↕</span>% תיאום</th>`;
+        h+=`<th class="sortable" onclick="sortTable('branchTable',6,'num',this)"><span class="sort-arrow">↕</span>הגיעו</th>`;
+        h+=`<th class="sortable" onclick="sortTable('branchTable',7,'num',this)"><span class="sort-arrow">↕</span>% הגעה</th>`;
+        h+=`<th class="sortable" onclick="sortTable('branchTable',8,'num',this)"><span class="sort-arrow">↕</span>הכנסות</th>`;
+        h+=`</tr></thead><tbody>`;
+        brSorted.forEach(([name,d],i)=>{
+            const meetR=d.leads>0?Math.round((d.meetings/d.leads)*100):0;
+            const arrR=d.meetings>0?Math.round((d.arrived/d.meetings)*100):0;
+            const avg=Math.round(d.leads/days*10)/10;
+            h+=`<tr>`;
+            h+=`<td style="font-weight:800;color:${i===0?'var(--green)':i===brSorted.length-1?'var(--red)':'var(--text-muted)'}">${i+1}</td>`;
+            h+=`<td style="font-weight:600">${esc(name)}</td>`;
+            h+=`<td>${d.leads}</td>`;
+            h+=`<td style="color:var(--text-muted)">${avg}</td>`;
+            h+=`<td>${d.meetings}</td>`;
+            h+=`<td><span class="badge ${meetR>=TARGETS.meetRate?'badge-green':meetR>=TARGETS.meetRate*0.7?'badge-orange':'badge-red'}">${meetR}%</span></td>`;
+            h+=`<td>${d.arrived}</td>`;
+            h+=`<td><span class="badge ${arrR>=TARGETS.arrRate?'badge-green':arrR>=TARGETS.arrRate*0.7?'badge-orange':'badge-red'}">${arrR}%</span></td>`;
+            h+=`<td style="font-weight:600">₪${d.rev.toLocaleString('he-IL')}</td>`;
+            h+=`</tr>`;
+        });
+        h+=`</tbody></table></div></div>`;
+    }
+
+    h+=`<div class="section"><div class="section-header"><div class="section-title">משפך שיווק</div></div><div class="funnel-card"><div class="funnel-steps" id="funnelEl"></div></div></div>`;
+
+    h+=`<div class="section"><div class="section-header"><div class="section-title">מגמת שלבים במשפך</div></div><div class="chart-card"><div class="chart-container" style="height:320px"><canvas id="funnelTrendC"></canvas></div></div></div>`;
+
+    h+=`<div class="section"><div class="charts-row"><div class="chart-card"><div class="chart-head"><span class="chart-title">לידים לאורך זמן</span><div class="chart-tabs"><button class="chart-tab active" onclick="switchLeadsChart('all',this)">הכל</button><button class="chart-tab" onclick="switchLeadsChart('calls',this)">שיחות</button><button class="chart-tab" onclick="switchLeadsChart('forms',this)">טפסים</button><button class="chart-tab" onclick="switchLeadsChart('meetings',this)">פגישות</button></div></div><div class="chart-container"><canvas id="leadsC"></canvas></div></div>`;
+    h+=`<div class="chart-card"><div class="chart-head"><span class="chart-title">ערוצי שיווק</span></div><div class="chart-container"><canvas id="chC"></canvas></div></div></div></div>`;
+
+    h+=`<div class="section"><div class="charts-row"><div class="chart-card"><div class="chart-head"><span class="chart-title">פילוח לפי שעות</span><div class="chart-tabs"><button class="chart-tab active" onclick="switchHoursChart('leads',this)">לידים</button><button class="chart-tab" onclick="switchHoursChart('missed',this)">לא נענו</button><button class="chart-tab" onclick="switchHoursChart('meetings',this)">פגישות</button></div></div><div class="chart-container"><canvas id="hrsC"></canvas></div></div>`;
+    h+=`<div class="list-card"><div class="chart-head"><span class="chart-title">סטטוס CRM</span></div><div id="crmListEl"></div></div></div></div>`;
+
+    h+=`<div class="section"><div class="charts-row"><div class="chart-card"><div class="chart-head"><span class="chart-title">לידים לפי ימי השבוע</span></div><div class="chart-container"><canvas id="dowC"></canvas></div></div>`;
+    h+=`<div class="chart-card"><div class="chart-head"><span class="chart-title">חדשים מול חוזרים</span></div><div class="chart-container"><canvas id="newRetC"></canvas></div></div></div></div>`;
+
+    const ooh=calls.filter(c=>{const d=pd(c.called_at);if(!d)return false;const h=d.getHours(),dw=d.getDay();return dw===6||h<8||h>=18;});
+    const oohFollowed=ooh.filter(c=>{const s=crm(c);return s&&s!=='אין מענה';});
+    const oohPct=t>0?Math.round((ooh.length/t)*100):0;
+    const oohFPct=ooh.length>0?Math.round((oohFollowed.length/ooh.length)*100):0;
+    h+=`<div class="section"><div class="section-header"><div class="section-title">לידים מחוץ לשעות פעילות</div></div><div class="charts-row">`;
+    h+=`<div class="chart-card"><div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap"><div><div class="kpi-val" style="color:var(--orange)">${ooh.length}</div><div class="kpi-label">לידים מחוץ לשעות (${oohPct}%)</div><div class="kpi-sub">לפני 08:00, אחרי 18:00, או שבת</div></div><div><div class="kpi-val" style="font-size:20px;color:${oohFPct>=50?'var(--green)':'var(--red)'}">${oohFPct}%</div><div class="kpi-label">קיבלו מעקב</div><div class="kpi-sub">${oohFollowed.length} מתוך ${ooh.length}</div></div></div></div>`;
+    h+=`<div class="chart-card"><div class="chart-head"><span class="chart-title">טפסים מול שיחות - מי ממיר?</span></div><div class="chart-container"><canvas id="fvcC"></canvas></div></div></div></div>`;
+
+    h+=`<div class="section"><div class="section-header"><div class="section-title">מפת חום: יום × שעה</div></div><div class="chart-card"><div id="heatmapEl" style="overflow-x:auto"></div></div></div>`;
+
+    const phoneCalls=calls.filter(isC);
+    const avgTalk=phoneCalls.length>0?Math.round(phoneCalls.reduce((s,c)=>s+(c.talk_time||0),0)/phoneCalls.length):0;
+    const avgRing=phoneCalls.length>0?Math.round(phoneCalls.reduce((s,c)=>s+(c.ring_time||0),0)/phoneCalls.length):0;
+    const shortCalls=phoneCalls.filter(c=>(c.talk_time||0)<30).length;
+    const longCalls=phoneCalls.filter(c=>(c.talk_time||0)>=120).length;
+    h+=`<div class="section"><div class="section-header"><div class="section-title">מדדי איכות שיחות</div></div><div class="charts-row">`;
+    h+=`<div class="chart-card"><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;text-align:center"><div><div class="kpi-val" style="font-size:22px;color:var(--blue)">${avgTalk}s</div><div class="kpi-sub">זמן שיחה ממוצע</div></div><div><div class="kpi-val" style="font-size:22px;color:var(--cyan)">${avgRing}s</div><div class="kpi-sub">זמן צלצול ממוצע</div></div><div><div class="kpi-val" style="font-size:22px;color:var(--red)">${shortCalls}</div><div class="kpi-sub">שיחות קצרות (&lt;30s)</div></div><div><div class="kpi-val" style="font-size:22px;color:var(--green)">${longCalls}</div><div class="kpi-sub">שיחות ארוכות (&gt;2 דק׳)</div></div></div><div style="margin-top:16px"><div class="chart-container" style="height:200px"><canvas id="cqBranchC"></canvas></div></div></div>`;
+    h+=`<div class="chart-card"><div class="chart-head"><span class="chart-title">התפלגות אורך שיחות</span></div><div class="chart-container"><canvas id="cqDistC"></canvas></div></div></div></div>`;
+
+    // Response Time
+    const rt=calcResponseTime(calls);
+    if(rt){
+        h+=`<div class="section"><div class="section-header"><div class="section-title">זמן תגובה לליד</div></div><div class="charts-row">`;
+        h+=`<div class="chart-card"><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;text-align:center">`;
+        h+=`<div><div class="kpi-val" style="font-size:28px;color:var(--accent)">${rt.avg}s</div><div class="kpi-sub">זמן שיחה ממוצע (שניות)</div></div>`;
+        h+=`<div><div class="kpi-val" style="font-size:28px;color:${rt.under30pct>50?'var(--red)':'var(--green)'}">${rt.under30pct}%</div><div class="kpi-sub">שיחות מתחת ל-30 שניות</div></div>`;
+        h+=`<div><div class="kpi-val" style="font-size:28px;color:var(--blue)">${rt.under60pct}%</div><div class="kpi-sub">שיחות מתחת לדקה</div></div>`;
+        h+=`</div></div>`;
+        h+=`<div class="chart-card"><div style="text-align:center;padding:20px"><div class="chart-title" style="margin-bottom:16px">פירוט</div>`;
+        h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:right;font-size:13px">`;
+        h+=`<div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--bg);border-radius:8px"><span>שיחות שנותחו</span><b>${rt.total}</b></div>`;
+        h+=`<div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--bg);border-radius:8px"><span>מתחת ל-30 שניות</span><b style="color:var(--red)">${rt.under30}</b></div>`;
+        h+=`<div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--bg);border-radius:8px"><span>מתחת לדקה</span><b style="color:var(--blue)">${rt.under60}</b></div>`;
+        h+=`<div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--bg);border-radius:8px"><span>ממוצע</span><b style="color:var(--accent)">${rt.avg}s</b></div>`;
+        h+=`</div></div></div></div></div>`;
+    }
+
+    // Repeat Callers
+    const rc=calcRepeatCallers(calls);
+    if(rc.totalRepeats>0){
+        h+=`<div class="section"><div class="section-header"><div class="section-title">לידים חוזרים</div></div><div class="charts-row">`;
+        h+=`<div class="chart-card"><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;text-align:center">`;
+        h+=`<div><div class="kpi-val" style="font-size:28px;color:var(--orange)">${rc.totalRepeats}</div><div class="kpi-sub">אנשים שהתקשרו יותר מפעם</div></div>`;
+        h+=`<div><div class="kpi-val" style="font-size:28px;color:var(--blue)">${rc.totalRepeatCalls}</div><div class="kpi-sub">סה"כ שיחות חוזרות</div></div>`;
+        h+=`<div><div class="kpi-val" style="font-size:28px;color:var(--green)">${rc.repeatsWithMeet}</div><div class="kpi-sub">מתוכם קבעו פגישה</div></div>`;
+        h+=`</div></div>`;
+        if(rc.repeats.length){
+            h+=`<div class="list-card"><div class="chart-head"><span class="chart-title">חוזרים מובילים</span></div>`;
+            rc.repeats.forEach(([ph,d])=>{
+                h+=`<div class="list-item"><div class="list-dot" style="background:var(--orange)"></div>`;
+                h+=`<span class="list-name">${esc(d.name||'ללא שם')} <span style="color:var(--text-muted);font-size:11px;direction:ltr">${esc(ph)}</span></span>`;
+                h+=`<span class="list-count">${d.count} שיחות</span>`;
+                h+=`<span style="font-size:11px">${d.hasMeet?'<span class="badge badge-green">קבע פגישה</span>':'<span class="badge badge-gray">ללא פגישה</span>'}</span>`;
+                h+=`</div>`;
+            });
+            h+=`</div>`;
+        }
+        h+=`</div></div>`;
+    }
+
+    _('content').innerHTML=h;
+    kpis.forEach((k,i)=>{if(!k.na){const el=document.querySelectorAll('.kpi-val')[i];if(el)animV(el,typeof k.val==='number'?k.val:0);}});
+    buildFunnel(calls);
+    buildFunnelTrend(calls);
+    buildLeadsChart(calls,'all');
+    buildChChart(calls);
+    buildHrsChart(calls,'leads');
+    buildCrmList(calls);
+    buildDowChart(calls);
+    buildNewRetChart(calls);
+    buildFormsVsCalls(calls);
+    buildHeatmap(calls);
+    buildCallQuality(calls);
+}
+
+function renderFunnelView(calls){
+    let h=`<div class="section"><div class="section-header"><div class="section-title">מדדי משפך מפורטים</div></div><div class="funnel-card"><div class="funnel-steps" id="funnelEl"></div></div></div>`;
+    h+=`<div class="section"><div class="section-header"><div class="section-title">מגמת שלבים במשפך</div></div><div class="chart-card"><div class="chart-container" style="height:360px"><canvas id="funnelTrendC"></canvas></div></div></div>`;
+
+    const noAns=calls.filter(c=>c.dial_status==='no-answer'||c.dial_status==='missed');
+    const noAnsFU=noAns.filter(c=>{const s=crm(c);return s&&s!=='אין מענה';});
+    const noAnsRate=noAns.length>0?Math.round((noAnsFU.length/noAns.length)*100):0;
+    const noAnsMeet=noAns.filter(isMeet).length;
+    h+=`<div class="section"><div class="section-header"><div class="section-title">מעקב אחרי "אין מענה"</div></div><div class="chart-card">`;
+    h+=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;text-align:center">`;
+    h+=`<div><div class="kpi-val" style="font-size:24px;color:var(--red)">${noAns.length}</div><div class="kpi-sub">שיחות ללא מענה</div></div>`;
+    h+=`<div><div class="kpi-val" style="font-size:24px;color:${noAnsRate>=50?'var(--green)':'var(--orange)'}">${noAnsRate}%</div><div class="kpi-sub">קיבלו מעקב</div></div>`;
+    h+=`<div><div class="kpi-val" style="font-size:24px;color:var(--blue)">${noAnsFU.length}</div><div class="kpi-sub">טופלו (עם סטטוס CRM)</div></div>`;
+    h+=`<div><div class="kpi-val" style="font-size:24px;color:var(--green)">${noAnsMeet}</div><div class="kpi-sub">הפכו לפגישה</div></div>`;
+    h+=`</div>`;
+    const noAnsLost=noAns.length-noAnsFU.length;
+    if(noAns.length>0){
+        const barW=noAnsRate;
+        h+=`<div style="margin-top:16px"><div style="display:flex;align-items:center;gap:8px;font-size:11px"><span style="color:var(--green)">טופל</span><div style="flex:1;height:12px;background:var(--bg);border-radius:6px;overflow:hidden;display:flex"><div style="width:${barW}%;background:var(--green);border-radius:6px 0 0 6px"></div><div style="width:${100-barW}%;background:var(--red);opacity:0.5;border-radius:0 6px 6px 0"></div></div><span style="color:var(--red)">לא טופל (${noAnsLost})</span></div></div>`;
+    }
+    h+=`</div></div>`;
+
+    h+=`<div class="section"><div class="section-header"><div class="section-title">פילוח סטטוס CRM</div></div><div class="list-card"><div id="crmListEl"></div></div></div>`;
+    _('content').innerHTML=h;
+    buildFunnel(calls);buildFunnelTrend(calls);buildCrmList(calls);
+}
+
+function renderBranchesView(calls){
+    const branches={};
+    calls.forEach(c=>{const b=nb(c);if(!b)return;if(!branches[b])branches[b]={leads:0,meetings:0,arrived:0,deals:0,rev:0,paid:0,ans:0,miss:0,forms:0};const d=branches[b];d.leads++;if(isMeet(c))d.meetings++;if(isArr(c))d.arrived++;const a=da(c);if(a>0){d.deals++;d.rev+=a;}d.paid+=dp(c);if(isA(c))d.ans++;if(isM(c))d.miss++;if(isF(c))d.forms++;});
+    const sorted=Object.entries(branches).sort((a,b)=>b[1].leads-a[1].leads);
+
+    let h=`<div class="section"><div class="section-header"><div class="section-title">השוואת סניפים</div></div><div class="branch-grid">`;
+    sorted.forEach(([name,d],i)=>{
+        const clr=BC[i%BC.length];
+        const mp=d.leads>0?Math.round((d.meetings/d.leads)*100):0;
+        const ap=d.meetings>0?Math.round((d.arrived/d.meetings)*100):0;
+        const aw=d.leads>0?(d.ans/d.leads)*100:0;
+        const fw=d.leads>0?(d.forms/d.leads)*100:0;
+        const mw=100-aw-fw;
+        const meetHit=mp>=TARGETS.meetRate,arrHit=ap>=TARGETS.arrRate;
+        h+=`<div class="branch-card"><div class="branch-head"><div class="branch-name"><div class="branch-dot" style="background:${clr}"></div>${esc(name)}</div><div class="branch-lead-count">${d.leads} לידים</div></div>
+        <div class="branch-metrics"><div><div class="bm-val" style="color:${meetHit?'var(--green)':'var(--red)'}">${d.meetings}</div><div class="bm-label">פגישות (${mp}%)</div><div style="font-size:9px;color:${meetHit?'var(--green)':'var(--red)'}">${meetHit?'✓':'✗'} יעד ${TARGETS.meetRate}%</div></div><div><div class="bm-val" style="color:${arrHit?'var(--green)':'var(--red)'}">${d.arrived}</div><div class="bm-label">הגיעו (${ap}%)</div><div style="font-size:9px;color:${arrHit?'var(--green)':'var(--red)'}">${arrHit?'✓':'✗'} יעד ${TARGETS.arrRate}%</div></div><div><div class="bm-val" style="color:var(--purple)">₪${d.rev.toLocaleString('he-IL')}</div><div class="bm-label">הכנסות</div></div></div>
+        <div class="branch-bar"><div style="width:${aw}%;background:var(--green)"></div><div style="width:${fw}%;background:var(--blue)"></div><div style="width:${mw}%;background:var(--red)"></div></div></div>`;
+    });
+    h+=`</div></div>`;
+
+    h+=`<div class="section"><div class="charts-row"><div class="chart-card"><div class="chart-head"><span class="chart-title">לידים לפי סניף לאורך זמן</span></div><div class="chart-container"><canvas id="branchTimeC"></canvas></div></div>`;
+    h+=`<div class="chart-card"><div class="chart-head"><span class="chart-title">המרות לפי סניף</span></div><div class="chart-container"><canvas id="branchConvC"></canvas></div></div></div></div>`;
+
+    h+=`<div class="section"><div class="section-header"><div class="section-title">מטריצת סטטוס CRM × סניף</div></div><div class="chart-card"><div class="chart-container" style="height:320px"><canvas id="crmBranchC"></canvas></div></div></div>`;
+
+    _('content').innerHTML=h;
+    buildBranchTimeChart(calls,sorted.map(s=>s[0]));
+    buildBranchConvChart(sorted);
+    buildCrmBranchMatrix(calls,sorted.map(s=>s[0]));
+}
+
+function renderChannelsView(calls){
+    const channels={};
+    calls.forEach(c=>{const ch=gCh(c);if(!channels[ch.n])channels[ch.n]={leads:0,meetings:0,arrived:0,rev:0,color:ch.c,ans:0,miss:0};const d=channels[ch.n];d.leads++;if(isMeet(c))d.meetings++;if(isArr(c))d.arrived++;d.rev+=da(c);if(isA(c))d.ans++;if(isM(c))d.miss++;});
+    const sorted=Object.entries(channels).sort((a,b)=>b[1].leads-a[1].leads);
+
+    let h=`<div class="section"><div class="section-header"><div class="section-title">ביצועים לפי ערוץ שיווק</div></div><div class="kpi-grid" style="grid-template-columns:repeat(auto-fill,minmax(250px,1fr))">`;
+    sorted.forEach(([name,d])=>{
+        const mp=d.leads>0?Math.round((d.meetings/d.leads)*100):0;
+        h+=`<div class="kpi-card" style="border-right:3px solid ${d.color}"><div class="kpi-top"><div class="kpi-icon" style="background:${d.color}15;color:${d.color}">${IC.broadcast}</div><span class="badge badge-gray">${d.leads} לידים</span></div>
+        <div class="kpi-val" style="font-size:18px;color:${d.color}">${esc(name)}</div>
+        <div style="display:flex;gap:16px;margin-top:10px"><div><div style="font-size:16px;font-weight:800;color:var(--green)">${d.meetings}</div><div class="kpi-sub">פגישות (${mp}%)</div></div><div><div style="font-size:16px;font-weight:800;color:var(--gold)">${d.arrived}</div><div class="kpi-sub">הגיעו</div></div><div><div style="font-size:16px;font-weight:800;color:var(--purple)">₪${d.rev.toLocaleString('he-IL')}</div><div class="kpi-sub">הכנסות</div></div></div></div>`;
+    });
+    h+=`</div></div>`;
+    h+=`<div class="section"><div class="charts-row"><div class="chart-card"><div class="chart-head"><span class="chart-title">חלוקת לידים לפי ערוץ</span></div><div class="chart-container"><canvas id="chC"></canvas></div></div><div class="chart-card"><div class="chart-head"><span class="chart-title">המרות לפי ערוץ</span></div><div class="chart-container"><canvas id="chConvC"></canvas></div></div></div></div>`;
+
+    const ivrCounts={};
+    calls.forEach(c=>{const cp=c.call_path;if(!cp||!Array.isArray(cp))return;cp.forEach(step=>{if(step.route_type==='VoiceMenuItem'){const n=step.route_name||'';const match=n.match(/:(\d+)$/);if(match)ivrCounts[n]=(ivrCounts[n]||0)+1;}});});
+    const ivrSorted=Object.entries(ivrCounts).sort((a,b)=>b[1]-a[1]);
+    if(ivrSorted.length){
+        h+=`<div class="section"><div class="section-header"><div class="section-title">IVR - בחירות בתפריט טלפוני</div></div><div class="charts-row"><div class="chart-card"><div class="chart-container"><canvas id="ivrC"></canvas></div></div>`;
+        h+=`<div class="list-card"><div class="chart-head"><span class="chart-title">בחירות תפריט</span></div><div id="ivrListEl"></div></div></div></div>`;
+    }
+
+    const pages={};
+    calls.forEach(c=>{let loc=c.location||'';if(!loc)return;try{const u=new URL(loc);loc=u.hostname+u.pathname;}catch{loc=loc.substring(0,60);}if(!pages[loc])pages[loc]={leads:0,meetings:0};pages[loc].leads++;if(isMeet(c))pages[loc].meetings++;});
+    const pgSorted=Object.entries(pages).filter(([_,d])=>d.leads>=2).sort((a,b)=>b[1].leads-a[1].leads);
+    if(pgSorted.length){
+        h+=`<div class="section"><div class="section-header"><div class="section-title">דפי נחיתה מובילים</div></div><div class="table-card"><div style="overflow-x:auto"><table><thead><tr><th>#</th><th>דף נחיתה</th><th>לידים</th><th>פגישות</th><th>% המרה</th></tr></thead><tbody>`;
+        pgSorted.slice(0,15).forEach(([name,d],i)=>{
+            const cv=d.leads>0?Math.round((d.meetings/d.leads)*100):0;
+            h+=`<tr><td style="font-weight:800;color:var(--text-muted)">${i+1}</td><td style="font-weight:500;font-size:11px;max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(name)}</td><td>${d.leads}</td><td>${d.meetings}</td><td><span class="badge ${cv>=15?'badge-green':cv>=8?'badge-orange':'badge-red'}">${cv}%</span></td></tr>`;
+        });
+        h+=`</tbody></table></div></div></div>`;
+    }
+
+    _('content').innerHTML=h;
+    buildChChart(calls);
+    buildChConvChart(sorted);
+    buildIvrChart(ivrSorted);
+}
+
+function renderCampaignsView(calls){
+    const campaigns={};
+    calls.forEach(c=>{
+        const cn=getCN(c);if(!cn)return;
+        if(!campaigns[cn])campaigns[cn]={leads:0,meetings:0,arrived:0,deals:0,rev:0,platform:getPL(c)||gCh(c).n,branches:{}};
+        const d=campaigns[cn];d.leads++;
+        if(isMeet(c))d.meetings++;
+        if(isArr(c))d.arrived++;
+        const a=da(c);if(a>0){d.deals++;d.rev+=a;}
+        const br=nb(c);if(br)d.branches[br]=(d.branches[br]||0)+1;
+    });
+    const sorted=Object.entries(campaigns).filter(([_,d])=>d.leads>=3).sort((a,b)=>b[1].leads-a[1].leads);
+    const totalLeads=sorted.reduce((s,x)=>s+x[1].leads,0)||1;
+    const maxLeads=sorted.length?sorted[0][1].leads:1;
+    const platColors={'Google Ads':'#4285f4','Facebook Ads':'#1877f2','Google My Business':'#34a853','תוסף שיחות Google':'#fbbc04'};
+
+    let h=`<div class="section"><div class="section-header"><div class="section-title">ביצועים לפי קמפיין</div><span style="font-size:12px;color:var(--text-muted)">${sorted.length} קמפיינים פעילים</span></div>`;
+    if(!sorted.length){
+        h+=`<div class="chart-card" style="text-align:center;padding:50px"><div style="margin-bottom:12px;color:var(--accent)">${IC.campaign}</div><div style="font-size:15px;font-weight:600;margin-bottom:6px;color:var(--text)">אין קמפיינים עם 3 לידים או יותר</div><div style="font-size:12px;color:var(--text-muted)">קמפיינים מחושבים לפי שדות campaign_name ו-platform</div></div>`;
+    } else {
+        sorted.forEach(([name,d],i)=>{
+            const cv=d.leads>0?Math.round((d.meetings/d.leads)*100):0;
+            const arrP=d.meetings>0?Math.round((d.arrived/d.meetings)*100):0;
+            const pctOfTotal=Math.round((d.leads/totalLeads)*100);
+            const barW=Math.max(4,Math.round((d.leads/maxLeads)*100));
+            const pc=platColors[d.platform]||'var(--accent)';
+            const brArr=Object.entries(d.branches).sort((a,b)=>b[1]-a[1]);
+
+            h+=`<div class="chart-card" style="margin-bottom:10px;border-right:3px solid ${pc}">`;
+            h+=`<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap">`;
+
+            h+=`<div style="flex:1;min-width:200px">`;
+            h+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">`;
+            h+=`<span style="font-size:14px;font-weight:800;color:${i<3?'var(--accent)':'var(--text-muted)'};min-width:20px">${i+1}</span>`;
+            h+=`<span style="font-size:14px;font-weight:700;color:var(--text);line-height:1.3">${esc(name)}</span>`;
+            h+=`</div>`;
+            h+=`<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">`;
+            h+=`<span class="badge" style="background:${pc}15;color:${pc};font-size:10px">${esc(d.platform)}</span>`;
+            h+=`<span style="font-size:11px;color:var(--text-muted)">${pctOfTotal}% מסה"כ</span>`;
+            h+=`</div>`;
+            h+=`<div style="height:6px;background:var(--bg);border-radius:3px;overflow:hidden;margin-bottom:8px"><div style="height:100%;width:${barW}%;background:${pc};border-radius:3px;transition:width 0.4s"></div></div>`;
+            if(brArr.length){
+                h+=`<div style="display:flex;gap:4px;flex-wrap:wrap">`;
+                brArr.forEach(([bn,bc])=>{h+=`<span style="font-size:10px;padding:2px 6px;background:var(--bg);border-radius:10px;color:var(--text-secondary)">${esc(bn)} <b>${bc}</b></span>`;});
+                h+=`</div>`;
+            }
+            h+=`</div>`;
+
+            h+=`<div style="display:flex;gap:20px;flex-shrink:0;align-items:flex-start">`;
+            h+=`<div style="text-align:center;min-width:52px"><div style="font-size:22px;font-weight:800;color:var(--blue)">${d.leads}</div><div style="font-size:10px;color:var(--text-muted)">לידים</div></div>`;
+            h+=`<div style="text-align:center;min-width:52px"><div style="font-size:22px;font-weight:800;color:var(--green)">${d.meetings}</div><div style="font-size:10px;color:var(--text-muted)">פגישות</div></div>`;
+            h+=`<div style="text-align:center;min-width:52px"><div style="font-size:22px;font-weight:800;color:var(--gold)">${d.arrived}</div><div style="font-size:10px;color:var(--text-muted)">הגיעו</div></div>`;
+            h+=`<div style="text-align:center;min-width:52px"><div style="font-size:18px;font-weight:800"><span class="badge ${cv>=15?'badge-green':cv>=8?'badge-orange':'badge-red'}" style="font-size:13px;padding:4px 10px">${cv}%</span></div><div style="font-size:10px;color:var(--text-muted);margin-top:4px">המרה</div></div>`;
+            if(d.rev>0){h+=`<div style="text-align:center;min-width:60px"><div style="font-size:18px;font-weight:800;color:var(--purple)">₪${d.rev.toLocaleString('he-IL')}</div><div style="font-size:10px;color:var(--text-muted)">הכנסות</div></div>`;}
+            h+=`</div>`;
+
+            h+=`</div></div>`;
+        });
+    }
+    h+=`</div>`;
+
+    if(sorted.length>1){
+        h+=`<div class="section"><div class="charts-row"><div class="chart-card"><div class="chart-head"><span class="chart-title">לידים לפי קמפיין</span></div><div class="chart-container"><canvas id="campBarC"></canvas></div></div>`;
+        h+=`<div class="chart-card"><div class="chart-head"><span class="chart-title">המרות לפי קמפיין</span></div><div class="chart-container"><canvas id="campConvC"></canvas></div></div></div></div>`;
+    }
+
+    h+=`<div class="section"><div class="section-header"><div class="section-title">פילוח לפי סוגי טיפולים</div></div><div class="charts-row"><div class="chart-card"><div class="chart-container"><canvas id="treatC"></canvas></div></div>`;
+    h+=`<div class="list-card"><div class="chart-head"><span class="chart-title">טיפולים מובילים</span></div><div id="treatListEl"></div></div></div></div>`;
+
+    const adsets={};
+    calls.forEach(c=>{const f=c.form||{};const as=f.adset_name;if(!as)return;if(!adsets[as])adsets[as]={leads:0,meetings:0,arrived:0,platform:f.platform||getPL(c)||''};adsets[as].leads++;if(isMeet(c))adsets[as].meetings++;if(isArr(c))adsets[as].arrived++;});
+    const adSorted=Object.entries(adsets).filter(([_,d])=>d.leads>=2).sort((a,b)=>b[1].leads-a[1].leads);
+    if(adSorted.length){
+        const adMax=adSorted[0][1].leads;
+        h+=`<div class="section"><div class="section-header"><div class="section-title">ביצועים ברמת Adset</div><span style="font-size:12px;color:var(--text-muted)">${adSorted.length} adsets</span></div>`;
+        adSorted.slice(0,20).forEach(([name,d],i)=>{
+            const cv=d.leads>0?Math.round((d.meetings/d.leads)*100):0;
+            const bw=Math.max(4,Math.round((d.leads/adMax)*100));
+            h+=`<div class="chart-card" style="margin-bottom:6px;padding:14px 20px"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px">`;
+            h+=`<div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:12px;font-weight:800;color:var(--text-muted);min-width:16px">${i+1}</span><span style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(name)}</span><span class="badge badge-blue" style="font-size:9px;flex-shrink:0">${esc(d.platform)}</span></div>`;
+            h+=`<div style="height:4px;background:var(--bg);border-radius:2px;overflow:hidden"><div style="height:100%;width:${bw}%;background:var(--accent);border-radius:2px"></div></div></div>`;
+            h+=`<div style="display:flex;gap:14px;flex-shrink:0"><div style="text-align:center"><div style="font-size:16px;font-weight:800;color:var(--blue)">${d.leads}</div><div style="font-size:9px;color:var(--text-muted)">לידים</div></div><div style="text-align:center"><div style="font-size:16px;font-weight:800;color:var(--green)">${d.meetings}</div><div style="font-size:9px;color:var(--text-muted)">פגישות</div></div><div style="text-align:center"><span class="badge ${cv>=15?'badge-green':cv>=8?'badge-orange':'badge-red'}" style="font-size:11px">${cv}%</span><div style="font-size:9px;color:var(--text-muted);margin-top:2px">המרה</div></div></div>`;
+            h+=`</div></div>`;
+        });
+        h+=`</div>`;
+    }
+
+    _('content').innerHTML=h;
+
+    if(sorted.length>1){
+        const top=sorted.slice(0,10);
+        const barCtx=document.getElementById('campBarC');
+        if(barCtx){
+            S.charts.campBar=new Chart(barCtx,{type:'bar',data:{labels:top.map(s=>s[0].length>25?s[0].slice(0,22)+'...':s[0]),
+            datasets:[{label:'לידים',data:top.map(s=>s[1].leads),backgroundColor:'#4f6ef7b3',borderRadius:3}]},options:co(false,10)});
+        }
+        const convCtx=document.getElementById('campConvC');
+        if(convCtx){
+            S.charts.campConv=new Chart(convCtx,{type:'bar',data:{labels:top.map(s=>s[0].length>25?s[0].slice(0,22)+'...':s[0]),
+            datasets:[{label:'פגישות',data:top.map(s=>s[1].meetings),backgroundColor:'#10b981b3',borderRadius:3},{label:'הגיעו',data:top.map(s=>s[1].arrived),backgroundColor:'#eab308b3',borderRadius:3}]},options:co(true,10)});
+        }
+    }
+    buildTreatmentTypes(calls);
+}
+
+function renderLeadsView(calls){
+    S.leadsLoaded=false;
+    let h=`<div class="section"><div class="table-card">
+    <div style="text-align:center;padding:50px 20px" id="leadsPlaceholder">
+        <div style="margin-bottom:12px;color:var(--accent)">${IC.leads}</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:6px">רשימת לידים (${calls.length})</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:20px">לחצי כדי לטעון את רשימת הלידים המלאה</div>
+        <button class="refresh-btn" style="font-size:13px;padding:10px 28px" onclick="loadLeadsTable()">טען רשימה</button>
+    </div>
+    <div id="leadsTableWrap" style="display:none">
+        <div class="table-top"><div class="chart-title">רשימת לידים (<span id="tCnt">0</span>)</div><div class="table-filters">
+        <button class="fbtn active" data-f="all" onclick="setTF('all')">הכל</button><button class="fbtn" data-f="call" onclick="setTF('call')">שיחות</button><button class="fbtn" data-f="form" onclick="setTF('form')">טפסים</button><button class="fbtn" data-f="noanswer" onclick="setTF('noanswer')">לא נענו</button><button class="fbtn" data-f="meeting" onclick="setTF('meeting')">פגישות</button><button class="fbtn" data-f="arrived" onclick="setTF('arrived')">הגיעו</button><button class="fbtn" data-f="deal" onclick="setTF('deal')">עסקאות</button>
+        <input type="text" class="table-search" placeholder="חיפוש..." id="tSrch" oninput="applyTF()"></div></div>
+        <div style="overflow-x:auto"><table id="leadsTable"><thead><tr>
+        <th class="sortable active" onclick="sortLeadsTable(0,'text',this)" data-dir="desc"><span class="sort-arrow">↓</span>תאריך</th>
+        <th class="sortable" onclick="sortLeadsTable(1,'text',this)"><span class="sort-arrow">↕</span>סוג</th>
+        <th class="sortable" onclick="sortLeadsTable(2,'text',this)"><span class="sort-arrow">↕</span>שם</th>
+        <th>טלפון</th>
+        <th class="sortable" onclick="sortLeadsTable(4,'text',this)"><span class="sort-arrow">↕</span>ערוץ</th>
+        <th class="sortable" onclick="sortLeadsTable(5,'text',this)"><span class="sort-arrow">↕</span>סניף</th>
+        <th class="sortable" onclick="sortLeadsTable(6,'text',this)"><span class="sort-arrow">↕</span>סטטוס CRM</th>
+        <th class="sortable" onclick="sortLeadsTable(7,'num',this)"><span class="sort-arrow">↕</span>עסקה</th>
+        <th>הקלטה</th>
+        </tr></thead><tbody id="tBody"></tbody></table></div>
+        <div class="pagination" id="pg"></div>
+    </div>
+    </div></div>`;
+    _('content').innerHTML=h;
+}
+
+function loadLeadsTable(){
+    const ph=_('leadsPlaceholder'),wrap=_('leadsTableWrap');
+    if(ph)ph.style.display='none';
+    if(wrap)wrap.style.display='block';
+    S.leadsLoaded=true;
+    renderTbl(fc());
+}
+
+// ═══ BUILD COMPONENTS ═══
+function buildFunnel(calls){
+    const t=calls.length,an=calls.filter(c=>isA(c)||isF(c)).length,mt=calls.filter(isMeet).length,ar=calls.filter(isArr).length,dl=calls.filter(c=>da(c)>0).length,rv=calls.reduce((s,c)=>s+da(c),0);
+    const steps=[{l:'לידים',v:t,c:'#3b82f6'},{l:'מענה / טופס',v:an,c:'#06b6d4'},{l:'נקבעה פגישה',v:mt,c:'#f59e0b',tgt:TARGETS.meetRate},{l:'הגיע לפגישה',v:ar,c:'#10b981',tgt:TARGETS.arrRate},{l:'עסקה',v:dl,c:'#8b5cf6',x:rv>0?'₪'+rv.toLocaleString('he-IL'):'',tgt:TARGETS.dealRate}];
+    const mx=Math.max(...steps.map(s=>s.v),1);
+    let html='';
+    steps.forEach((s,i)=>{
+        const ht=Math.max(36,(s.v/mx)*110);
+        html+=`<div class="funnel-step"><div class="funnel-bar" style="height:${ht}px;background:${s.c}">${s.v}</div><div class="funnel-label">${s.l}</div>${s.x?`<div class="funnel-sub">${s.x}</div>`:''}`;
+        html+=`</div>`;
+        if(i<steps.length-1){
+            const r=steps[i].v>0?Math.round((steps[i+1].v/steps[i].v)*100):0;
+            const tgt=steps[i+1].tgt;
+            const hit=tgt?r>=tgt:true;
+            html+=`<div class="funnel-arrow"><span class="arr">←</span><span class="pct" style="color:${tgt?(hit?'var(--green)':'var(--red)'):'var(--accent)'}">${r}%</span>`;
+            if(tgt)html+=`<span style="font-size:9px;color:var(--text-muted)">יעד ${tgt}%</span>`;
+            html+=`</div>`;
+        }
+    });
+    const el=_('funnelEl');if(el)el.innerHTML=html;
+}
+
+function buildCrmList(calls){
+    const counts={};calls.forEach(c=>{const s=crm(c);if(s)counts[s]=(counts[s]||0)+1;});
+    const total=Object.values(counts).reduce((a,b)=>a+b,0)||1;
+    const sorted=Object.entries(counts).sort((a,b)=>(CRMM[a[0]]?.o||99)-(CRMM[b[0]]?.o||99));
+    const el=_('crmListEl');if(!el)return;
+    el.innerHTML=sorted.map(([n,c])=>{const m=CRMM[n]||{c:'#9ca3af',b:'badge-gray'};return`<div class="list-item"><div class="list-dot" style="background:${m.c}"></div><span class="list-name">${esc(n)}</span><span class="list-count">${c}</span><span class="list-pct">${Math.round((c/total)*100)}%</span><div class="list-bar"><div class="list-bar-fill" style="width:${(c/total)*100}%;background:${m.c}"></div></div></div>`;}).join('');
+}
+
+function buildFunnelTrend(calls){
+    const stages=[
+        {key:'total',label:'סה"כ לידים',color:'#3b82f6',filter:()=>true},
+        {key:'answered',label:'עם מענה / טופס',color:'#06b6d4',filter:c=>isA(c)||isF(c)},
+        {key:'meeting',label:'נקבעה פגישה',color:'#f59e0b',filter:isMeet},
+        {key:'arrived',label:'הגיע לפגישה',color:'#10b981',filter:isArr},
+        {key:'deal',label:'עסקה',color:'#8b5cf6',filter:c=>da(c)>0},
+    ];
+
+    const daily={};
+    calls.forEach(c=>{
+        const d=pd(c.called_at);if(!d)return;
+        const k=fd(d);
+        if(!daily[k])daily[k]={};
+        stages.forEach(s=>{if(!daily[k][s.key])daily[k][s.key]=0;if(s.filter(c))daily[k][s.key]++;});
+    });
+
+    const dates=Object.keys(daily).sort();
+    const labels=dates.map(d=>new Date(d).toLocaleDateString('he-IL',{day:'numeric',month:'short'}));
+
+    const cumulative={};
+    stages.forEach(s=>cumulative[s.key]=[]);
+    dates.forEach(d=>{
+        stages.forEach(s=>{
+            const prev=cumulative[s.key].length>0?cumulative[s.key][cumulative[s.key].length-1]:0;
+            cumulative[s.key].push(prev+(daily[d][s.key]||0));
+        });
+    });
+
+    const ctx=document.getElementById('funnelTrendC');if(!ctx)return;
+    const dk=isDark();
+    S.charts.funnelTrend=new Chart(ctx,{
+        type:'line',
+        data:{
+            labels,
+            datasets:stages.map(s=>({
+                label:s.label,
+                data:cumulative[s.key],
+                borderColor:s.color,
+                backgroundColor:s.color+'18',
+                fill:true,
+                tension:0.4,
+                pointRadius:2,
+                pointHoverRadius:5,
+                borderWidth:2.5,
+            }))
+        },
+        options:{
+            responsive:true,maintainAspectRatio:false,
+            interaction:{mode:'index',intersect:false},
+            plugins:{
+                legend:{position:'top',rtl:true,align:'start',labels:{color:dk?'#9ca3af':'#6b7280',font:{family:'Ping',size:11},padding:14,boxWidth:14,boxHeight:4,useBorderRadius:true,borderRadius:2}},
+                tooltip:{...tt(),mode:'index',intersect:false}
+            },
+            scales:{
+                x:{grid:{display:false},ticks:{color:dk?'#6b7280':'#9ca3af',font:{family:'Ping',size:11},maxRotation:0}},
+                y:{beginAtZero:true,grid:{color:dk?'#2a2d3e':'#f0f0f5'},ticks:{color:dk?'#6b7280':'#9ca3af',font:{family:'Ping'}},stacked:false}
+            }
+        }
+    });
+}
+
+let leadsChartMode='all';
+function switchLeadsChart(mode,btn){leadsChartMode=mode;btn.parentElement.querySelectorAll('.chart-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');if(S.charts.leads){S.charts.leads.destroy();S.charts.leads=null;}buildLeadsChart(fc(),mode);}
+
+function buildLeadsChart(calls,mode='all'){
+    const dc={},df={},dm={};let tc=0,tf=0,tm=0;
+    calls.forEach(c=>{const d=pd(c.called_at);if(!d)return;const k=fd(d);if(isF(c)){df[k]=(df[k]||0)+1;tf++;}else{dc[k]=(dc[k]||0)+1;tc++;}if(isMeet(c)){dm[k]=(dm[k]||0)+1;tm++;}});
+    const dates=[...new Set([...Object.keys(dc),...Object.keys(df),...Object.keys(dm)])].sort();
+    const labels=dates.map(d=>new Date(d).toLocaleDateString('he-IL',{day:'numeric',month:'short'}));
+    const ctx=document.getElementById('leadsC');if(!ctx)return;
+    const datasets=[];
+    if(mode==='all'||mode==='calls')datasets.push({label:`שיחות (${tc})`,data:dates.map(d=>dc[d]||0),borderColor:'#06b6d4',backgroundColor:'rgba(6,182,212,0.08)',fill:true,tension:0.4,pointRadius:3,borderWidth:2});
+    if(mode==='all'||mode==='forms')datasets.push({label:`טפסים (${tf})`,data:dates.map(d=>df[d]||0),borderColor:'#ec4899',backgroundColor:'rgba(236,72,153,0.08)',fill:true,tension:0.4,pointRadius:3,borderWidth:2});
+    if(mode==='meetings')datasets.push({label:`פגישות (${tm})`,data:dates.map(d=>dm[d]||0),borderColor:'#10b981',backgroundColor:'rgba(16,185,129,0.08)',fill:true,tension:0.4,pointRadius:3,borderWidth:2});
+    S.charts.leads=new Chart(ctx,{type:'line',data:{labels,datasets},options:co(true)});
+}
+
+function buildChChart(calls){
+    const counts={};calls.forEach(c=>{const ch=gCh(c);counts[ch.n]=counts[ch.n]||{v:0,c:ch.c};counts[ch.n].v++;});
+    const sorted=Object.entries(counts).sort((a,b)=>b[1].v-a[1].v).slice(0,8);
+    const ctx=document.getElementById('chC');if(!ctx)return;
+    const dk=isDark();
+    S.charts.ch=new Chart(ctx,{type:'doughnut',data:{labels:sorted.map(s=>s[0]),datasets:[{data:sorted.map(s=>s[1].v),backgroundColor:sorted.map(s=>s[1].c),borderWidth:0,hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',rtl:true,labels:{color:dk?'#9ca3af':'#6b7280',font:{family:'Ping',size:11},padding:10,boxWidth:14,boxHeight:4,useBorderRadius:true,borderRadius:2}},tooltip:tt()}}});
+}
+
+let hoursMode='leads';
+function switchHoursChart(mode,btn){hoursMode=mode;btn.parentElement.querySelectorAll('.chart-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');if(S.charts.hrs){S.charts.hrs.destroy();S.charts.hrs=null;}buildHrsChart(fc(),mode);}
+
+function buildHrsChart(calls,mode='leads'){
+    const hrs=new Array(24).fill(0);
+    calls.forEach(c=>{const d=pd(c.called_at);if(!d)return;if(mode==='missed'&&!isM(c))return;if(mode==='meetings'&&!isMeet(c))return;hrs[d.getHours()]++;});
+    const ctx=document.getElementById('hrsC');if(!ctx)return;
+    const colors={leads:'#4f6ef7',missed:'#ef4444',meetings:'#10b981'};
+    S.charts.hrs=new Chart(ctx,{type:'bar',data:{labels:Array.from({length:24},(_,i)=>`${String(i).padStart(2,'0')}:00`),
+    datasets:[{data:hrs,backgroundColor:hrs.map((_,i)=>i>=8&&i<=20?colors[mode]+'b3':colors[mode]+'25'),borderRadius:3,borderSkipped:false}]},options:co(false,10)});
+}
+
+function buildBranchTimeChart(calls,branchNames){
+    const data={};branchNames.forEach(b=>data[b]={});
+    calls.forEach(c=>{const b=nb(c),d=pd(c.called_at);if(!b||!d||!data[b])return;const k=fd(d);data[b][k]=(data[b][k]||0)+1;});
+    const allDates=[...new Set(Object.values(data).flatMap(d=>Object.keys(d)))].sort();
+    const labels=allDates.map(d=>new Date(d).toLocaleDateString('he-IL',{day:'numeric',month:'short'}));
+    const ctx=document.getElementById('branchTimeC');if(!ctx)return;
+    S.charts.brTime=new Chart(ctx,{type:'line',data:{labels,datasets:branchNames.map((b,i)=>({label:b,data:allDates.map(d=>data[b][d]||0),borderColor:BC[i%BC.length],tension:0.4,pointRadius:2,borderWidth:2}))},options:co(true)});
+}
+
+function buildBranchConvChart(sorted){
+    const ctx=document.getElementById('branchConvC');if(!ctx)return;
+    S.charts.brConv=new Chart(ctx,{type:'bar',data:{labels:sorted.map(s=>s[0]),
+    datasets:[{label:'פגישות',data:sorted.map(s=>s[1].meetings),backgroundColor:'#10b981b3',borderRadius:3},{label:'הגיעו',data:sorted.map(s=>s[1].arrived),backgroundColor:'#eab308b3',borderRadius:3},{label:'עסקאות',data:sorted.map(s=>s[1].deals),backgroundColor:'#8b5cf6b3',borderRadius:3}]},
+    options:{...co(true),scales:{...co(true).scales,x:{...co(true).scales.x,stacked:false}}}});
+}
+
+function buildCrmBranchMatrix(calls,branchNames){
+    const statuses=Object.keys(CRMM);
+    const matrix={};
+    branchNames.forEach(b=>{matrix[b]={};statuses.forEach(s=>matrix[b][s]=0);});
+    calls.forEach(c=>{const b=nb(c),s=crm(c);if(!b||!s||!matrix[b])return;if(matrix[b][s]!==undefined)matrix[b][s]++;});
+    const ctx=document.getElementById('crmBranchC');if(!ctx)return;
+    S.charts.crmBranch=new Chart(ctx,{type:'bar',data:{
+        labels:branchNames,
+        datasets:statuses.map(s=>({label:s,data:branchNames.map(b=>matrix[b][s]),backgroundColor:CRMM[s].c+'b3',borderRadius:2}))
+    },options:{...co(true),scales:{x:{stacked:true,grid:{display:false},ticks:{color:isDark()?'#6b7280':'#9ca3af',font:{family:'Ping',size:11}}},y:{stacked:true,beginAtZero:true,grid:{color:isDark()?'#2a2d3e':'#f0f0f5'},ticks:{color:isDark()?'#6b7280':'#9ca3af',font:{family:'Ping'}}}}}});
+}
+
+function buildChConvChart(sorted){
+    const ctx=document.getElementById('chConvC');if(!ctx)return;
+    S.charts.chConv=new Chart(ctx,{type:'bar',data:{labels:sorted.map(s=>s[0]),
+    datasets:[{label:'לידים',data:sorted.map(s=>s[1].leads),backgroundColor:sorted.map(s=>s[1].color+'80'),borderRadius:3},{label:'פגישות',data:sorted.map(s=>s[1].meetings),backgroundColor:'#10b981b3',borderRadius:3}]},
+    options:co(true)});
+}
+
+function buildDowChart(calls){
+    const dayNames=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+    const counts=new Array(7).fill(0);
+    calls.forEach(c=>{const d=pd(c.called_at);if(!d)return;counts[d.getDay()]++;});
+    const ctx=document.getElementById('dowC');if(!ctx)return;
+    const mx=Math.max(...counts,1);
+    S.charts.dow=new Chart(ctx,{type:'bar',data:{labels:dayNames,
+    datasets:[{data:counts,backgroundColor:counts.map(v=>v===mx?'#4f6ef7':'#4f6ef7b3'),borderRadius:4,borderSkipped:false}]},options:co(false)});
+}
+
+function buildNewRetChart(calls){
+    const newC=calls.filter(c=>c.is_new_caller).length;
+    const retC=calls.length-newC;
+    const ctx=document.getElementById('newRetC');if(!ctx)return;
+    const dk=isDark();
+    S.charts.newRet=new Chart(ctx,{type:'doughnut',data:{labels:['לידים חדשים','לידים חוזרים'],
+    datasets:[{data:[newC,retC],backgroundColor:['#4f6ef7','#f59e0b'],borderWidth:0,hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',rtl:true,labels:{color:dk?'#9ca3af':'#6b7280',font:{family:'Ping',size:11},padding:10,boxWidth:14,boxHeight:4,useBorderRadius:true,borderRadius:2}},tooltip:tt()}}});
+}
+
+// ═══ IVR CHART ═══
+function buildIvrChart(ivrSorted){
+    if(!ivrSorted.length)return;
+    const ctx=document.getElementById('ivrC');
+    if(ctx){
+        const dk=isDark();
+        S.charts.ivr=new Chart(ctx,{type:'doughnut',data:{
+            labels:ivrSorted.map(s=>s[0]),
+            datasets:[{data:ivrSorted.map(s=>s[1]),backgroundColor:BC.map(c=>c+'cc'),borderWidth:0,hoverOffset:6}]
+        },options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom',rtl:true,labels:{color:dk?'#9ca3af':'#6b7280',font:{family:'Ping',size:10},padding:8,boxWidth:12,boxHeight:4,useBorderRadius:true,borderRadius:2}},tooltip:tt()}}});
+    }
+    const el=_('ivrListEl');
+    if(el){
+        const total=ivrSorted.reduce((s,x)=>s+x[1],0)||1;
+        el.innerHTML=ivrSorted.map(([n,c],i)=>{
+            return`<div class="list-item"><div class="list-dot" style="background:${BC[i%BC.length]}"></div><span class="list-name">${esc(n)}</span><span class="list-count">${c}</span><span class="list-pct">${Math.round((c/total)*100)}%</span><div class="list-bar"><div class="list-bar-fill" style="width:${(c/total)*100}%;background:${BC[i%BC.length]}"></div></div></div>`;
+        }).join('');
+    }
+}
+
+// ═══ TREATMENT TYPES ═══
+function buildTreatmentTypes(calls){
+    const TM={
+        'eyelid|עפעפיים|blepharoplasty':'הרמת עפעפיים',
+        'cellulite|צלוליט':'טיפול צלוליט',
+        'face.?sculpt|פיסול פנים|face.?contour':'פיסול פנים',
+        'pigment|פיגמנט|כתמים':'טיפול פיגמנטציה',
+        'hair|שיער':'טיפולי שיער',
+        'botox|בוטוקס':'בוטוקס',
+        'filler|פילר|חומצה':'פילרים',
+        'laser|לייזר':'לייזר',
+        'pmax|performance.?max':'Performance Max',
+        'brand|מותג':'מותג',
+    };
+    const counts={},meets={};
+    calls.forEach(c=>{
+        const cn=(getCN(c)||'').toLowerCase();if(!cn)return;
+        let found=false;
+        for(const[pattern,label]of Object.entries(TM)){
+            if(new RegExp(pattern,'i').test(cn)){
+                counts[label]=(counts[label]||0)+1;
+                if(isMeet(c))meets[label]=(meets[label]||0)+1;
+                found=true;break;
+            }
+        }
+        if(!found){counts['אחר']=(counts['אחר']||0)+1;if(isMeet(c))meets['אחר']=(meets['אחר']||0)+1;}
+    });
+    const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+    const ctx=document.getElementById('treatC');
+    if(ctx&&sorted.length){
+        const dk=isDark();
+        const colors=['#4f6ef7','#10b981','#f59e0b','#ec4899','#06b6d4','#8b5cf6','#ef4444','#3b82f6','#eab308','#9ca3af'];
+        S.charts.treat=new Chart(ctx,{type:'doughnut',data:{
+            labels:sorted.map(s=>s[0]),
+            datasets:[{data:sorted.map(s=>s[1]),backgroundColor:colors.slice(0,sorted.length),borderWidth:0,hoverOffset:6}]
+        },options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom',rtl:true,labels:{color:dk?'#9ca3af':'#6b7280',font:{family:'Ping',size:11},padding:8,boxWidth:12,boxHeight:4,useBorderRadius:true,borderRadius:2}},tooltip:tt()}}});
+    }
+    const el=_('treatListEl');
+    if(el&&sorted.length){
+        const total=sorted.reduce((s,x)=>s+x[1],0)||1;
+        const colors=['#4f6ef7','#10b981','#f59e0b','#ec4899','#06b6d4','#8b5cf6','#ef4444','#3b82f6','#eab308','#9ca3af'];
+        el.innerHTML=sorted.map(([n,c],i)=>{
+            const m=meets[n]||0;const cv=c>0?Math.round((m/c)*100):0;
+            return`<div class="list-item"><div class="list-dot" style="background:${colors[i%colors.length]}"></div><span class="list-name">${esc(n)}</span><span class="list-count">${c}</span><span class="list-pct">${cv}% המרה</span><div class="list-bar"><div class="list-bar-fill" style="width:${(c/total)*100}%;background:${colors[i%colors.length]}"></div></div></div>`;
+        }).join('');
+    }
+}
+
+// ═══ FORMS VS CALLS ═══
+function buildFormsVsCalls(calls){
+    const forms=calls.filter(isF),phoneCalls=calls.filter(isC);
+    const fMeet=forms.filter(isMeet).length;
+    const cMeet=phoneCalls.filter(isMeet).length;
+    const fRate=forms.length>0?Math.round((fMeet/forms.length)*100):0;
+    const cRate=phoneCalls.length>0?Math.round((cMeet/phoneCalls.length)*100):0;
+    const ctx=document.getElementById('fvcC');if(!ctx)return;
+    S.charts.fvc=new Chart(ctx,{type:'bar',data:{
+        labels:['טפסים','שיחות טלפון'],
+        datasets:[
+            {label:'סה"כ לידים',data:[forms.length,phoneCalls.length],backgroundColor:['#ec489980','#06b6d480'],borderRadius:4},
+            {label:'פגישות',data:[fMeet,cMeet],backgroundColor:['#10b98180','#10b98180'],borderRadius:4},
+        ]
+    },options:{...co(true),plugins:{...co(true).plugins,tooltip:{...tt(),callbacks:{afterBody:function(ctx){
+        const i=ctx[0].dataIndex;const rate=i===0?fRate:cRate;return `המרה: ${rate}%`;
+    }}}}}});
+}
+
+// ═══ HEATMAP ═══
+function buildHeatmap(calls){
+    const el=_('heatmapEl');if(!el)return;
+    const dayNames=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+    const grid=Array.from({length:7},()=>new Array(24).fill(0));
+    let mx=0;
+    calls.forEach(c=>{const d=pd(c.called_at);if(!d)return;const dw=d.getDay(),hr=d.getHours();grid[dw][hr]++;if(grid[dw][hr]>mx)mx=grid[dw][hr];});
+    if(mx===0)mx=1;
+    const hours=[];for(let i=6;i<24;i++)hours.push(i);for(let i=0;i<6;i++)hours.push(i);
+    let html='<table class="heatmap-table"><thead><tr><th></th>';
+    hours.forEach(h=>html+=`<th>${String(h).padStart(2,'0')}</th>`);
+    html+='</tr></thead><tbody>';
+    for(let dw=0;dw<7;dw++){
+        html+=`<tr><th style="text-align:right;padding-right:8px;white-space:nowrap">${dayNames[dw]}</th>`;
+        hours.forEach(hr=>{
+            const v=grid[dw][hr];const intensity=v/mx;
+            const bg=intensity===0?'var(--bg)':`rgba(79,110,247,${0.12+intensity*0.78})`;
+            const txtColor=intensity>0.5?'#fff':'var(--text)';
+            html+=`<td><div class="hm-cell" style="background:${bg};color:${txtColor}" title="${dayNames[dw]} ${String(hr).padStart(2,'0')}:00 — ${v} לידים">${v||''}</div></td>`;
+        });
+        html+='</tr>';
+    }
+    html+='</tbody></table>';
+    el.innerHTML=html;
+}
+
+// ═══ CALL QUALITY ═══
+function buildCallQuality(calls){
+    const phoneCalls=calls.filter(isC);
+    const branchTalk={};
+    phoneCalls.forEach(c=>{const b=nb(c);if(!b)return;if(!branchTalk[b])branchTalk[b]={total:0,count:0};branchTalk[b].total+=(c.talk_time||0);branchTalk[b].count++;});
+    const bSorted=Object.entries(branchTalk).sort((a,b)=>b[1].count-a[1].count);
+    const ctx1=document.getElementById('cqBranchC');
+    if(ctx1&&bSorted.length){
+        S.charts.cqBranch=new Chart(ctx1,{type:'bar',data:{
+            labels:bSorted.map(s=>s[0]),
+            datasets:[{label:'זמן שיחה ממוצע (שניות)',data:bSorted.map(s=>Math.round(s[1].total/s[1].count)),backgroundColor:BC.map(c=>c+'b3'),borderRadius:4}]
+        },options:co(false)});
+    }
+
+    const buckets={'0-15':0,'15-30':0,'30-60':0,'60-120':0,'120-300':0,'300+':0};
+    phoneCalls.forEach(c=>{const t=c.talk_time||0;if(t<15)buckets['0-15']++;else if(t<30)buckets['15-30']++;else if(t<60)buckets['30-60']++;else if(t<120)buckets['60-120']++;else if(t<300)buckets['120-300']++;else buckets['300+']++;});
+    const ctx2=document.getElementById('cqDistC');
+    if(ctx2){
+        const dk=isDark();
+        S.charts.cqDist=new Chart(ctx2,{type:'doughnut',data:{
+            labels:Object.keys(buckets).map(k=>k+'s'),
+            datasets:[{data:Object.values(buckets),backgroundColor:['#ef4444','#f59e0b','#eab308','#10b981','#3b82f6','#8b5cf6'],borderWidth:0,hoverOffset:6}]
+        },options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom',rtl:true,labels:{color:dk?'#9ca3af':'#6b7280',font:{family:'Ping',size:10},padding:8,boxWidth:12,boxHeight:4,useBorderRadius:true,borderRadius:2}},tooltip:tt()}}});
+    }
+}
+
+// ═══ TABLE ═══
+function setTF(f){S.tableFilter=f;S.tablePage=1;document.querySelectorAll('.fbtn').forEach(b=>b.classList.toggle('active',b.dataset.f===f));renderTbl(fc());}
+function applyTF(){S.tableSearch=(_('tSrch')||{}).value?.toLowerCase()||'';S.tablePage=1;renderTbl(fc());}
+
+function renderTbl(calls){
+    let list=calls;const f=S.tableFilter;
+    if(f==='call')list=list.filter(isC);else if(f==='form')list=list.filter(isF);
+    else if(f==='noanswer')list=list.filter(c=>c.dial_status==='no-answer'||c.dial_status==='missed');
+    else if(f==='meeting')list=list.filter(isMeet);
+    else if(f==='arrived')list=list.filter(isArr);
+    else if(f==='deal')list=list.filter(c=>da(c)>0);
+    const q=S.tableSearch;
+    if(q)list=list.filter(c=>(c.name||'').toLowerCase().includes(q)||(c.caller_number||'').includes(q)||(c.source||'').toLowerCase().includes(q)||nb(c).includes(q)||crm(c).includes(q));
+
+    const cnt=_('tCnt');if(cnt)cnt.textContent=list.length;
+    const pp=20,tp=Math.max(1,Math.ceil(list.length/pp));S.tablePage=Math.min(S.tablePage,tp);
+    const start=(S.tablePage-1)*pp,page=list.slice(start,start+pp);
+    const tbody=_('tBody');if(!tbody)return;
+    if(!page.length){tbody.innerHTML='<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text-muted)">לא נמצאו תוצאות</td></tr>';const pe=_('pg');if(pe)pe.innerHTML='';return;}
+
+    tbody.innerHTML=page.map(c=>{
+        const date=pd(c.called_at),ds=date?date.toLocaleString('he-IL',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
+        const fm=isF(c),ch=gCh(c),br=nb(c),cs=crm(c),cm=CRMM[cs]||{b:'badge-gray'},deal=da(c);
+        const audioUrl=c.audio||'';
+        const audioCell=audioUrl?`<button class="audio-btn" onclick="toggleAudio(this,'${esc(audioUrl)}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> השמע</button>`:'—';
+        return`<tr><td style="white-space:nowrap">${ds}</td><td><span class="badge ${fm?'badge-pink':'badge-blue'}">${fm?'טופס':'שיחה'}</span></td><td>${esc(c.name||c.cnam||'—')}</td><td style="direction:ltr;text-align:right;white-space:nowrap">${esc(c.caller_number_format||c.caller_number||c.contact_number||'—')}</td><td><span class="badge" style="background:${ch.c}12;color:${ch.c}">${esc(ch.n)}</span></td><td style="font-size:11px">${esc(br||'—')}</td><td>${cs?`<span class="badge ${cm.b}">${esc(cs)}</span>`:'—'}</td><td>${deal>0?`<span style="color:var(--green);font-weight:700">₪${deal.toLocaleString('he-IL')}</span>`:'—'}</td><td>${audioCell}</td></tr>`;
+    }).join('');
+
+    const pe=_('pg');if(!pe)return;
+    if(tp<=1){pe.innerHTML='';return;}
+    pe.innerHTML=`<button ${S.tablePage===1?'disabled':''} onclick="S.tablePage--;renderTbl(fc())">→ הקודם</button><span class="page-info">עמוד ${S.tablePage} מתוך ${tp}</span><button ${S.tablePage===tp?'disabled':''} onclick="S.tablePage++;renderTbl(fc())">הבא ←</button>`;
+}
+
+// ═══ DATE ═══
+function setDP(p){
+    const now=new Date();let f,t;
+    switch(p){case 'today':f=t=new Date();break;case 'yesterday':f=t=new Date();f.setDate(f.getDate()-1);break;case '7days':t=new Date();f=new Date();f.setDate(f.getDate()-7);break;case '30days':t=new Date();f=new Date();f.setDate(f.getDate()-30);break;case 'thisMonth':f=new Date(now.getFullYear(),now.getMonth(),1);t=new Date();break;case 'lastMonth':f=new Date(now.getFullYear(),now.getMonth()-1,1);t=new Date(now.getFullYear(),now.getMonth(),0);break;case 'thisYear':f=new Date(now.getFullYear(),0,1);t=new Date();break;}
+    S.dateFrom=f;S.dateTo=t;_('dateFrom').value=fd(f);_('dateTo').value=fd(t);
+    document.querySelectorAll('.date-presets button').forEach(b=>b.classList.remove('active'));
+    document.querySelector(`[data-dp="${p}"]`)?.classList.add('active');
+    refreshData();
+}
+_('dateFrom')?.addEventListener('change',function(){S.dateFrom=new Date(this.value);document.querySelectorAll('.date-presets button').forEach(b=>b.classList.remove('active'));refreshData();});
+_('dateTo')?.addEventListener('change',function(){S.dateTo=new Date(this.value);document.querySelectorAll('.date-presets button').forEach(b=>b.classList.remove('active'));refreshData();});
+
+// ═══ UTIL ═══
+function _(id){return document.getElementById(id);}
+function fd(d){if(!d)return '';const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`;}
+function pct(a,b){return b>0?Math.round((a/b)*100)+'%':'0%';}
+function animV(el,end){const t0=performance.now();(function s(n){const p=Math.min((n-t0)/500,1);el.textContent=Math.round((1-Math.pow(1-p,3))*end).toLocaleString('he-IL');if(p<1)requestAnimationFrame(s);})(t0);}
+function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+function sl(ms){return new Promise(r=>setTimeout(r,ms));}
+function co(legend,xSz){
+    const dk=isDark();const tc=dk?'#6b7280':'#9ca3af';const lc=dk?'#9ca3af':'#6b7280';const gc=dk?'#2a2d3e':'#f0f0f5';
+    return{responsive:true,maintainAspectRatio:false,plugins:{legend:legend?{position:'top',rtl:true,align:'start',labels:{color:lc,font:{family:'Ping',size:11},padding:14,boxWidth:14,boxHeight:4,useBorderRadius:true,borderRadius:2}}:{display:false},tooltip:tt()},scales:{x:{grid:{display:false},ticks:{color:tc,font:{family:'Ping',size:xSz||11},maxRotation:0}},y:{beginAtZero:true,grid:{color:gc},ticks:{color:tc,font:{family:'Ping'}}}}};
+}
+function tt(){
+    const dk=isDark();
+    return{rtl:true,textDirection:'rtl',backgroundColor:dk?'#1a1d2e':'#fff',titleColor:dk?'#e5e7ee':'#1a1d2e',bodyColor:dk?'#9ca3af':'#6b7280',borderColor:dk?'#2a2d3e':'#e5e7ee',borderWidth:1,titleFont:{family:'Ping',weight:600},bodyFont:{family:'Ping'},padding:10,boxPadding:4};
+}
+function drillDown(filter){
+    S.tableFilter=filter;S.tablePage=1;
+    setView('leads');
+    setTimeout(()=>{
+        loadLeadsTable();
+        document.querySelectorAll('.fbtn').forEach(b=>b.classList.toggle('active',b.dataset.f===filter));
+    },50);
+}
+
+let leadsSortCol=0,leadsSortDir='desc';
+function sortLeadsTable(col,type,thEl){
+    const table=document.getElementById('leadsTable');if(!table)return;
+    const allTh=table.querySelectorAll('thead th.sortable');
+    if(col===leadsSortCol){leadsSortDir=leadsSortDir==='desc'?'asc':'desc';}
+    else{leadsSortCol=col;leadsSortDir='desc';}
+    allTh.forEach(th=>{th.classList.remove('active');th.dataset.dir='';const ar=th.querySelector('.sort-arrow');if(ar)ar.textContent='↕';});
+    thEl.classList.add('active');thEl.dataset.dir=leadsSortDir;
+    const ar=thEl.querySelector('.sort-arrow');if(ar)ar.textContent=leadsSortDir==='desc'?'↓':'↑';
+    sortTable('leadsTable',col,type,thEl);
+}
+
+function sortTable(tableId,colIdx,type,thEl){
+    const table=document.getElementById(tableId);if(!table)return;
+    const tbody=table.querySelector('tbody');if(!tbody)return;
+    const rows=Array.from(tbody.querySelectorAll('tr'));
+    const allTh=table.querySelectorAll('thead th.sortable');
+    let dir='desc';
+    if(thEl.classList.contains('active')){
+        dir=thEl.dataset.dir==='desc'?'asc':'desc';
+    }
+    allTh.forEach(th=>{th.classList.remove('active');th.dataset.dir='';const ar=th.querySelector('.sort-arrow');if(ar)ar.textContent='↕';});
+    thEl.classList.add('active');
+    thEl.dataset.dir=dir;
+    const ar=thEl.querySelector('.sort-arrow');if(ar)ar.textContent=dir==='desc'?'↓':'↑';
+
+    rows.sort((a,b)=>{
+        let va=a.cells[colIdx]?.textContent?.trim()||'';
+        let vb=b.cells[colIdx]?.textContent?.trim()||'';
+        if(type==='num'){
+            va=parseFloat(va.replace(/[^\d.-]/g,''))||0;
+            vb=parseFloat(vb.replace(/[^\d.-]/g,''))||0;
+            return dir==='desc'?vb-va:va-vb;
+        }
+        return dir==='desc'?vb.localeCompare(va,'he'):va.localeCompare(vb,'he');
+    });
+    rows.forEach((r,i)=>{r.cells[0].textContent=i+1;tbody.appendChild(r);});
+}
+
+function toggleAudio(btn,url){
+    const existing=btn.parentElement.querySelector('.audio-player');
+    if(existing){existing.remove();btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> השמע';return;}
+    document.querySelectorAll('.audio-player').forEach(p=>p.remove());
+    const div=document.createElement('div');div.className='audio-player';
+    div.innerHTML=`<audio controls autoplay preload="none"><source src="${url}" type="audio/mpeg">דפדפן לא תומך</audio>`;
+    btn.parentElement.appendChild(div);
+    btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> עצור';
+}
+
+// ═══ EMPTY STATE ═══
+function emptyState(title,sub){
+    return `<div class="empty-state-card"><div class="empty-state-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2M9 9h.01M15 9h.01"/></svg></div><div class="empty-state-title">${title}</div><div class="empty-state-sub">${sub}</div></div>`;
+}
+
+// ═══ RESPONSE TIME ═══
+function calcResponseTime(calls){
+    const withCrm=calls.filter(c=>{const s=crm(c);return s&&s!=='אין מענה'&&!isF(c);});
+    if(!withCrm.length)return null;
+    const times=withCrm.map(c=>{
+        const called=pd(c.called_at);if(!called)return null;
+        const tt=c.talk_time||0;
+        return tt;
+    }).filter(t=>t!==null&&t>0);
+    if(!times.length)return null;
+    const avg=Math.round(times.reduce((s,t)=>s+t,0)/times.length);
+    const under30=times.filter(t=>t<30).length;
+    const under60=times.filter(t=>t<60).length;
+    return {avg,under30,under60,total:times.length,under30pct:Math.round((under30/times.length)*100),under60pct:Math.round((under60/times.length)*100)};
+}
+
+// ═══ REPEAT CALLERS ═══
+function calcRepeatCallers(calls){
+    const byPhone={};
+    calls.forEach(c=>{
+        const ph=c.caller_number_bare||c.caller_number_format||'';
+        if(!ph||ph.length<6)return;
+        if(!byPhone[ph])byPhone[ph]={count:0,name:c.name||'',hasMeet:false};
+        byPhone[ph].count++;
+        if(isMeet(c))byPhone[ph].hasMeet=true;
+    });
+    const repeats=Object.entries(byPhone).filter(([_,d])=>d.count>1).sort((a,b)=>b[1].count-a[1].count);
+    const totalRepeats=repeats.length;
+    const totalRepeatCalls=repeats.reduce((s,x)=>s+x[1].count,0);
+    const repeatsWithMeet=repeats.filter(([_,d])=>d.hasMeet).length;
+    return {repeats:repeats.slice(0,10),totalRepeats,totalRepeatCalls,repeatsWithMeet};
+}
+
+// ═══ EXPORT EXCEL ═══
+function exportExcel(){
+    const calls=fc();
+    if(!calls.length){toast('אין נתונים לייצוא','error');return;}
+    const BOM='\uFEFF';
+    const headers=['תאריך','סוג','שם','טלפון','ערוץ','סניף','סטטוס CRM','סכום עסקה','שולם','קמפיין'];
+    const rows=calls.map(c=>{
+        const date=pd(c.called_at);
+        const ds=date?date.toLocaleString('he-IL',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'';
+        return [ds,isF(c)?'טופס':'שיחה',c.name||'',c.caller_number_format||c.caller_number_bare||'',gCh(c).n,nb(c),crm(c),da(c)||'',dp(c)||'',getCN(c)];
+    });
+    let csv=BOM+headers.join(',')+'\n';
+    rows.forEach(r=>{csv+=r.map(v=>'"'+(v+'').replace(/"/g,'""')+'"').join(',')+'\n';});
+
+    const summaryHeaders=['מדד','ערך'];
+    const t=calls.length,mt=calls.filter(isMeet).length,ar=calls.filter(isArr).length,dl=calls.filter(c=>da(c)>0).length;
+    const tr=calls.reduce((s,c)=>s+da(c),0);
+    const summaryRows=[
+        ['סה"כ לידים',t],['שיחות',calls.filter(isC).length],['טפסים',calls.filter(isF).length],
+        ['פגישות שתואמו',mt],['הגיעו לפגישה',ar],['עסקאות',dl],
+        ['אחוז תיאום',t>0?Math.round((mt/t)*100)+'%':'0%'],
+        ['אחוז הגעה',mt>0?Math.round((ar/mt)*100)+'%':'0%'],
+        ['מחזור הכנסות','₪'+tr.toLocaleString('he-IL')],
+    ];
+    csv+='\n\n'+summaryHeaders.join(',')+'\n';
+    summaryRows.forEach(r=>{csv+=r.map(v=>'"'+(v+'').replace(/"/g,'""')+'"').join(',')+'\n';});
+
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+    const link=document.createElement('a');
+    const from=_('dateFrom')?.value||'', to=_('dateTo')?.value||'';
+    link.href=URL.createObjectURL(blob);
+    link.download=`true-beauty-report_${from}_${to}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+    toast(`יוצאו ${calls.length} לידים לקובץ Excel`,'success');
+}
+
+function toast(msg,type='info'){const c=_('tc'),t=document.createElement('div');t.className=`toast ${type}`;t.textContent=msg;c.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(16px)';t.style.transition='all 0.3s';setTimeout(()=>t.remove(),300);},3500);}
+</script>
+</body>
+</html>

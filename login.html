@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>התחברות | True Beauty</title>
+    <style>
+        @font-face { font-family: 'Ping'; src: url('https://my-fonts-bucket-results.s3.eu-north-1.amazonaws.com/pingnew/ping-regular.woff2') format('woff2'); font-weight: 400; }
+        @font-face { font-family: 'Ping'; src: url('https://my-fonts-bucket-results.s3.eu-north-1.amazonaws.com/pingnew/ping-bold.woff2') format('woff2'); font-weight: 700; }
+        @font-face { font-family: 'Ping'; src: url('https://my-fonts-bucket-results.s3.eu-north-1.amazonaws.com/pingnew/ping-heavy.woff2') format('woff2'); font-weight: 900; }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Ping', 'Heebo', sans-serif; background: #f4f6fa; min-height: 100vh; display: flex; align-items: center; justify-content: center; direction: rtl; }
+
+        .login-container {
+            width: 100%; max-width: 420px; padding: 20px;
+        }
+
+        .login-card {
+            background: #fff; border-radius: 20px; padding: 48px 40px;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.08); text-align: center;
+        }
+
+        .logo-wrap {
+            width: 64px; height: 64px; background: linear-gradient(135deg, #4f6ef7, #818cf8);
+            border-radius: 16px; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px; font-size: 22px; font-weight: 900; color: #fff; letter-spacing: -1px;
+        }
+
+        .login-title { font-size: 22px; font-weight: 800; color: #1a1d2e; margin-bottom: 6px; }
+        .login-sub { font-size: 13px; color: #9ca3af; margin-bottom: 32px; }
+
+        .field { margin-bottom: 16px; text-align: right; }
+        .field label { display: block; font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 6px; }
+        .field input {
+            width: 100%; padding: 12px 14px; border: 1.5px solid #e5e7ee; border-radius: 10px;
+            font-family: inherit; font-size: 14px; color: #1a1d2e; background: #f9fafb;
+            transition: all 0.2s; direction: ltr; text-align: right;
+        }
+        .field input:focus { outline: none; border-color: #4f6ef7; background: #fff; box-shadow: 0 0 0 3px rgba(79,110,247,0.1); }
+
+        .login-btn {
+            width: 100%; padding: 13px; background: linear-gradient(135deg, #4f6ef7, #6b85f9);
+            border: none; border-radius: 10px; color: #fff; font-family: inherit;
+            font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+            margin-top: 8px;
+        }
+        .login-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(79,110,247,0.35); }
+        .login-btn:active { transform: translateY(0); }
+        .login-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .error-msg {
+            background: #fef2f2; border: 1px solid #fecaca; color: #dc2626;
+            padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px;
+            display: none;
+        }
+        .error-msg.show { display: block; }
+
+        .footer-text { margin-top: 24px; font-size: 11px; color: #d1d5db; }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <div class="login-card">
+        <div class="logo-wrap">TB</div>
+        <div class="login-title">True Beauty</div>
+        <div class="login-sub">דאשבורד שיווק — התחברות</div>
+
+        <div class="error-msg" id="errMsg"></div>
+
+        <form onsubmit="doLogin(event)">
+            <div class="field">
+                <label>שם משתמש</label>
+                <input type="text" id="username" autocomplete="username" required autofocus>
+            </div>
+            <div class="field">
+                <label>סיסמה</label>
+                <input type="password" id="password" autocomplete="current-password" required>
+            </div>
+            <button type="submit" class="login-btn" id="loginBtn">התחבר</button>
+        </form>
+
+        <div class="footer-text">Powered by Results Group</div>
+    </div>
+</div>
+
+<script>
+async function doLogin(e) {
+    e.preventDefault();
+    const btn = document.getElementById('loginBtn');
+    const err = document.getElementById('errMsg');
+    btn.disabled = true;
+    btn.textContent = 'מתחבר...';
+    err.classList.remove('show');
+
+    try {
+        const r = await fetch('/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                username: document.getElementById('username').value,
+                password: document.getElementById('password').value
+            })
+        });
+        const data = await r.json();
+        if (!r.ok) {
+            err.textContent = data.error || 'שגיאה בהתחברות';
+            err.classList.add('show');
+            btn.disabled = false;
+            btn.textContent = 'התחבר';
+            return;
+        }
+        if (data.role === 'admin') {
+            window.location.href = '/admin.html';
+        } else {
+            window.location.href = '/dashboard.html';
+        }
+    } catch (ex) {
+        err.textContent = 'שגיאת חיבור לשרת';
+        err.classList.add('show');
+        btn.disabled = false;
+        btn.textContent = 'התחבר';
+    }
+}
+
+fetch('/auth/me').then(r => r.json()).then(data => {
+    if (data.role) window.location.href = data.role === 'admin' ? '/admin.html' : '/dashboard.html';
+}).catch(() => {});
+</script>
+</body>
+</html>

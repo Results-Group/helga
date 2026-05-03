@@ -1,0 +1,27 @@
+node_modules/
+.DS_Store
+*.log
+
+# Don't ignore users.json - it contains the user accounts
+# Don't ignore other HTML files that aren't part of the dashboard
+dr-oksana.html
+dr-oksana-thanks.html
+dblog-dry.html
+dblog.html
+pophy.html
+campaign-manager-questionnaire.html
+deli-cream.html
+sassonic.html
+relax-matham-haruva.html
+ulike.html
+sun-benefit.html
+velor-alpha-gold.html
+alphagold-q3-2025.html
+coimpact.html
+benyair.html
+hodclinic-q1-2026.html
+hodclinic.html
+harela.html
+index.html
+snoring.html
+mystudios.html

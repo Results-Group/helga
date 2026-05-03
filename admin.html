@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>אזור ניהול | True Beauty</title>
+    <style>
+        @font-face { font-family: 'Ping'; src: url('https://my-fonts-bucket-results.s3.eu-north-1.amazonaws.com/pingnew/ping-regular.woff2') format('woff2'); font-weight: 400; }
+        @font-face { font-family: 'Ping'; src: url('https://my-fonts-bucket-results.s3.eu-north-1.amazonaws.com/pingnew/ping-bold.woff2') format('woff2'); font-weight: 700; }
+        @font-face { font-family: 'Ping'; src: url('https://my-fonts-bucket-results.s3.eu-north-1.amazonaws.com/pingnew/ping-heavy.woff2') format('woff2'); font-weight: 900; }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Ping', 'Heebo', sans-serif; background: #f4f6fa; min-height: 100vh; direction: rtl; color: #1a1d2e; }
+
+        .top-bar {
+            background: #fff; padding: 16px 32px; display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid #e5e7ee; position: sticky; top: 0; z-index: 100;
+        }
+        .top-bar-right { display: flex; align-items: center; gap: 12px; }
+        .logo-mark {
+            width: 36px; height: 36px; background: linear-gradient(135deg, #4f6ef7, #818cf8);
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 900; color: #fff;
+        }
+        .top-title { font-size: 16px; font-weight: 800; }
+        .top-sub { font-size: 11px; color: #9ca3af; }
+        .top-bar-left { display: flex; align-items: center; gap: 12px; }
+        .dash-link {
+            padding: 8px 16px; border-radius: 8px; background: #f0f4ff; color: #4f6ef7;
+            text-decoration: none; font-size: 13px; font-weight: 600; transition: all 0.2s;
+        }
+        .dash-link:hover { background: #4f6ef7; color: #fff; }
+        .logout-btn {
+            padding: 8px 16px; border-radius: 8px; background: #fef2f2; color: #dc2626;
+            border: none; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+        }
+        .logout-btn:hover { background: #dc2626; color: #fff; }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 32px 20px; }
+
+        .section-title {
+            font-size: 18px; font-weight: 800; margin-bottom: 16px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .section-icon {
+            width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+        }
+
+        .card {
+            background: #fff; border-radius: 14px; padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04); margin-bottom: 24px;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: right; padding: 10px 12px; font-size: 12px; font-weight: 600; color: #9ca3af; border-bottom: 1px solid #f3f4f6; }
+        td { padding: 12px; font-size: 13px; border-bottom: 1px solid #f9fafb; vertical-align: middle; }
+
+        .role-badge {
+            display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;
+        }
+        .role-admin { background: #fef3c7; color: #b45309; }
+        .role-client { background: #dbeafe; color: #1d4ed8; }
+        .role-branch { background: #d1fae5; color: #047857; }
+
+        .act-btn {
+            padding: 5px 12px; border-radius: 6px; border: 1px solid #e5e7ee; background: #fff;
+            font-family: inherit; font-size: 11px; cursor: pointer; font-weight: 600; transition: all 0.15s;
+        }
+        .act-btn:hover { background: #f0f4ff; border-color: #4f6ef7; color: #4f6ef7; }
+        .act-btn.danger { color: #dc2626; }
+        .act-btn.danger:hover { background: #fef2f2; border-color: #dc2626; }
+
+        .add-btn {
+            padding: 10px 20px; background: linear-gradient(135deg, #4f6ef7, #6b85f9);
+            border: none; border-radius: 10px; color: #fff; font-family: inherit;
+            font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+        }
+        .add-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(79,110,247,0.3); }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4); z-index: 1000; display: none;
+            align-items: center; justify-content: center;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal {
+            background: #fff; border-radius: 16px; padding: 32px; width: 90%; max-width: 440px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+        .modal h3 { font-size: 16px; font-weight: 800; margin-bottom: 20px; }
+        .modal .field { margin-bottom: 14px; }
+        .modal .field label { display: block; font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 5px; }
+        .modal .field input, .modal .field select {
+            width: 100%; padding: 10px 12px; border: 1.5px solid #e5e7ee; border-radius: 8px;
+            font-family: inherit; font-size: 13px; background: #f9fafb;
+        }
+        .modal .field input:focus, .modal .field select:focus { outline: none; border-color: #4f6ef7; background: #fff; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-actions button { flex: 1; padding: 10px; border-radius: 8px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; border: none; }
+        .btn-save { background: #4f6ef7; color: #fff; }
+        .btn-save:hover { background: #3b5de7; }
+        .btn-cancel { background: #f3f4f6; color: #6b7280; }
+        .btn-cancel:hover { background: #e5e7ee; }
+
+        .branch-field { display: none; }
+        .branch-field.show { display: block; }
+
+        .empty-state { text-align: center; padding: 32px; color: #9ca3af; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-right">
+        <div class="logo-mark">TB</div>
+        <div>
+            <div class="top-title">אזור ניהול</div>
+            <div class="top-sub">True Beauty Dashboard</div>
+        </div>
+    </div>
+    <div class="top-bar-left">
+        <a href="/dashboard.html" class="dash-link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-left:4px"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M3 9h6"/></svg>
+            דאשבורד
+        </a>
+        <button class="logout-btn" onclick="logout()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-left:4px"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+            התנתק
+        </button>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Users Section -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div class="section-title" style="margin-bottom:0">
+            <div class="section-icon" style="background:#f0f4ff;color:#4f6ef7">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+            </div>
+            ניהול משתמשים
+        </div>
+        <button class="add-btn" onclick="openModal()">+ הוסף משתמש</button>
+    </div>
+
+    <div class="card">
+        <table>
+            <thead>
+                <tr><th>שם</th><th>שם משתמש</th><th>תפקיד</th><th>סניף</th><th>פעולות</th></tr>
+            </thead>
+            <tbody id="usersBody">
+                <tr><td colspan="5" class="empty-state">טוען...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Quick Info -->
+    <div class="section-title">
+        <div class="section-icon" style="background:#f0fdf4;color:#16a34a">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        </div>
+        מידע על ההרשאות
+    </div>
+    <div class="card" style="font-size:13px;line-height:2.2">
+        <div><span class="role-badge role-admin">אדמין</span> — גישה מלאה: דאשבורד + ניהול משתמשים</div>
+        <div><span class="role-badge role-client">לקוח</span> — גישה לדאשבורד בלבד, כל הסניפים</div>
+        <div><span class="role-badge role-branch">מנהל סניף</span> — גישה לדאשבורד, רק נתוני הסניף שהוגדר</div>
+    </div>
+</div>
+
+<!-- User Modal -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <h3 id="modalTitle">הוסף משתמש</h3>
+        <input type="hidden" id="editId">
+        <div class="field">
+            <label>שם תצוגה</label>
+            <input type="text" id="mName" placeholder="למשל: הלגה רקנטי">
+        </div>
+        <div class="field">
+            <label>שם משתמש</label>
+            <input type="text" id="mUsername" placeholder="באנגלית" dir="ltr" style="text-align:left">
+        </div>
+        <div class="field">
+            <label id="pwLabel">סיסמה</label>
+            <input type="password" id="mPassword" dir="ltr" style="text-align:left">
+        </div>
+        <div class="field">
+            <label>תפקיד</label>
+            <select id="mRole" onchange="toggleBranch()">
+                <option value="admin">אדמין</option>
+                <option value="client">לקוח</option>
+                <option value="branch">מנהל סניף</option>
+            </select>
+        </div>
+        <div class="field branch-field" id="branchField">
+            <label>סניף</label>
+            <select id="mBranch">
+                <option value="">בחר סניף</option>
+                <option value="סניף ראשל״צ">סניף ראשל״צ</option>
+                <option value="סניף אשדוד">סניף אשדוד</option>
+                <option value="סניף נתניה">סניף נתניה</option>
+                <option value="סניף ירושלים">סניף ירושלים</option>
+            </select>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-save" onclick="saveUser()">שמור</button>
+            <button class="btn-cancel" onclick="closeModal()">ביטול</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const ROLES = { admin: 'אדמין', client: 'לקוח', branch: 'מנהל סניף' };
+const ROLE_CLASS = { admin: 'role-admin', client: 'role-client', branch: 'role-branch' };
+
+async function checkAuth() {
+    try {
+        const r = await fetch('/auth/me');
+        const d = await r.json();
+        if (d.role !== 'admin') { window.location.href = d.role ? '/dashboard.html' : '/login.html'; return; }
+    } catch { window.location.href = '/login.html'; }
+}
+
+async function loadUsers() {
+    const r = await fetch('/auth/users');
+    if (!r.ok) return;
+    const users = await r.json();
+    const tb = document.getElementById('usersBody');
+    if (!users.length) { tb.innerHTML = '<tr><td colspan="5" class="empty-state">אין משתמשים</td></tr>'; return; }
+    tb.innerHTML = users.map(u => `
+        <tr>
+            <td style="font-weight:600">${u.name}</td>
+            <td style="direction:ltr;text-align:right;color:#6b7280">${u.username}</td>
+            <td><span class="role-badge ${ROLE_CLASS[u.role] || 'role-client'}">${ROLES[u.role] || u.role}</span></td>
+            <td style="color:#6b7280">${u.branch || '—'}</td>
+            <td>
+                <button class="act-btn" onclick='editUser(${JSON.stringify(u)})'>ערוך</button>
+                <button class="act-btn danger" onclick="deleteUser('${u.id}','${u.name}')">מחק</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function toggleBranch() {
+    document.getElementById('branchField').classList.toggle('show', document.getElementById('mRole').value === 'branch');
+}
+
+function openModal(user) {
+    document.getElementById('modalTitle').textContent = user ? 'ערוך משתמש' : 'הוסף משתמש';
+    document.getElementById('editId').value = user ? user.id : '';
+    document.getElementById('mName').value = user ? user.name : '';
+    document.getElementById('mUsername').value = user ? user.username : '';
+    document.getElementById('mPassword').value = '';
+    document.getElementById('pwLabel').textContent = user ? 'סיסמה חדשה (השאר ריק לשמור קיים)' : 'סיסמה';
+    document.getElementById('mRole').value = user ? user.role : 'client';
+    document.getElementById('mBranch').value = user ? (user.branch || '') : '';
+    document.getElementById('mUsername').disabled = !!user;
+    toggleBranch();
+    document.getElementById('modalOverlay').classList.add('show');
+}
+
+function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); }
+
+function editUser(u) { openModal(u); }
+
+async function saveUser() {
+    const id = document.getElementById('editId').value;
+    const payload = {
+        name: document.getElementById('mName').value,
+        username: document.getElementById('mUsername').value,
+        role: document.getElementById('mRole').value,
+        branch: document.getElementById('mRole').value === 'branch' ? document.getElementById('mBranch').value : '',
+    };
+    const pw = document.getElementById('mPassword').value;
+    if (pw) payload.password = pw;
+
+    if (id) {
+        payload.id = id;
+        await fetch('/auth/users/update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    } else {
+        if (!payload.password) { alert('נא להזין סיסמה'); return; }
+        await fetch('/auth/users/create', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    }
+    closeModal();
+    loadUsers();
+}
+
+async function deleteUser(id, name) {
+    if (!confirm(`למחוק את המשתמש "${name}"?`)) return;
+    await fetch('/auth/users/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+    loadUsers();
+}
+
+async function logout() {
+    await fetch('/auth/logout');
+    window.location.href = '/login.html';
+}
+
+checkAuth();
+loadUsers();
+</script>
+</body>
+</html>

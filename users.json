@@ -1,0 +1,18 @@
+[
+  {
+    "id": "1",
+    "username": "admin",
+    "password": "6355d12c586a7cfc51a095fe1c462015dcb65dd9587e239c6eacc365accd68f7",
+    "name": "מנהל מערכת",
+    "role": "admin",
+    "branch": ""
+  },
+  {
+    "id": "2",
+    "username": "helga",
+    "password": "2dbf7d659d2ce33ae85cddc98a15fbee21618e7c5c0b10164c53195d3c1ab7f2",
+    "name": "הלגה רקנטי",
+    "role": "client",
+    "branch": ""
+  }
+]
