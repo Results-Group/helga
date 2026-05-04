@@ -8,15 +8,33 @@ const crypto = require('crypto');
 const PORT = process.env.PORT || 3001;
 const CTM_API_BASE = 'https://api.calltrackingmetrics.de';
 const cache = new Map();
-const CACHE_TTL = 15 * 60 * 1000;
+const CACHE_TTL_LIVE = 15 * 60 * 1000;
+const CACHE_TTL_HIST = 7 * 24 * 60 * 60 * 1000;
 const CACHE_FILE = path.join(__dirname, '.cache.json');
+
+function getCacheTTL(cacheKey) {
+    try {
+        const u = new URL(cacheKey);
+        const endDate = u.searchParams.get('end_date');
+        if (endDate) {
+            const end = new Date(endDate + 'T23:59:59');
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            if (end < today) return CACHE_TTL_HIST;
+        }
+    } catch {}
+    return CACHE_TTL_LIVE;
+}
+
+function isCacheValid(entry, key) {
+    return Date.now() - entry.time < getCacheTTL(key);
+}
 
 function loadCache() {
     try {
         const raw = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf8'));
         let loaded = 0;
         for (const [k, v] of Object.entries(raw)) {
-            if (Date.now() - v.time < CACHE_TTL) { cache.set(k, v); loaded++; }
+            if (isCacheValid(v, k)) { cache.set(k, v); loaded++; }
         }
         if (loaded) console.log(`[CACHE] Restored ${loaded} entries from disk`);
     } catch {}
@@ -26,7 +44,7 @@ function persistCache() {
     try {
         const obj = {};
         for (const [k, v] of cache.entries()) {
-            if (Date.now() - v.time < CACHE_TTL) obj[k] = v;
+            if (isCacheValid(v, k)) obj[k] = v;
         }
         fs.writeFileSync(CACHE_FILE, JSON.stringify(obj));
     } catch (e) { console.error('[CACHE] persist error:', e.message); }
@@ -232,8 +250,9 @@ const server = http.createServer(async (req, res) => {
 
         const cacheKey = targetUrl;
         const cached = cache.get(cacheKey);
-        if (cached && Date.now() - cached.time < CACHE_TTL) {
-            console.log(`[CACHE] HIT (${Math.round((Date.now()-cached.time)/1000)}s old)`);
+        if (cached && isCacheValid(cached, cacheKey)) {
+            const ttl = getCacheTTL(cacheKey);
+            console.log(`[CACHE] HIT (${Math.round((Date.now()-cached.time)/1000)}s old, TTL ${Math.round(ttl/60000)}m)`);
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(cached.body);
             return;
