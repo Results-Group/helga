@@ -1404,7 +1404,7 @@ function loadLeadsTable(){
 // ═══ BUILD COMPONENTS ═══
 function buildFunnel(calls){
     const t=calls.length,an=calls.filter(c=>isA(c)||isF(c)).length,mt=calls.filter(isMeet).length,ar=calls.filter(isArr).length,dl=calls.filter(c=>da(c)>0).length,rv=calls.reduce((s,c)=>s+da(c),0);
-    const steps=[{l:'לידים',v:t,c:'#3b82f6'},{l:'מענה / טופס',v:an,c:'#06b6d4'},{l:'נקבעה פגישה',v:mt,c:'#f59e0b',tgt:TARGETS.meetRate},{l:'הגיע לפגישה',v:ar,c:'#10b981',tgt:TARGETS.arrRate},{l:'עסקה',v:dl,c:'#8b5cf6',x:rv>0?'₪'+rv.toLocaleString('he-IL'):'',tgt:TARGETS.dealRate}];
+    const steps=[{l:'לידים',v:t,c:'#3b82f6'},{l:'ענו בשיחה',v:an,c:'#06b6d4'},{l:'נקבעה פגישה',v:mt,c:'#f59e0b',tgt:TARGETS.meetRate},{l:'הגיע לפגישה',v:ar,c:'#10b981',tgt:TARGETS.arrRate},{l:'עסקה',v:dl,c:'#8b5cf6',x:rv>0?'₪'+rv.toLocaleString('he-IL'):'',tgt:TARGETS.dealRate}];
     const mx=Math.max(...steps.map(s=>s.v),1);
     let html='';
     steps.forEach((s,i)=>{
@@ -1434,7 +1434,7 @@ function buildCrmList(calls){
 function buildFunnelTrend(calls){
     const stages=[
         {key:'total',label:'סה"כ לידים',color:'#3b82f6',filter:()=>true},
-        {key:'answered',label:'עם מענה / טופס',color:'#06b6d4',filter:c=>isA(c)||isF(c)},
+        {key:'answered',label:'ענו בשיחה',color:'#06b6d4',filter:c=>isA(c)||isF(c)},
         {key:'meeting',label:'נקבעה פגישה',color:'#f59e0b',filter:isMeet},
         {key:'arrived',label:'הגיע לפגישה',color:'#10b981',filter:isArr},
         {key:'deal',label:'עסקה',color:'#8b5cf6',filter:c=>da(c)>0},
