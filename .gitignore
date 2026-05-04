@@ -1,6 +1,7 @@
 node_modules/
 .DS_Store
 *.log
+.cache.json
 
 # Don't ignore users.json - it contains the user accounts
 # Don't ignore other HTML files that aren't part of the dashboard

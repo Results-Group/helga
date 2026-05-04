@@ -8,7 +8,32 @@ const crypto = require('crypto');
 const PORT = process.env.PORT || 3001;
 const CTM_API_BASE = 'https://api.calltrackingmetrics.de';
 const cache = new Map();
-const CACHE_TTL = 3 * 60 * 1000;
+const CACHE_TTL = 15 * 60 * 1000;
+const CACHE_FILE = path.join(__dirname, '.cache.json');
+
+function loadCache() {
+    try {
+        const raw = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf8'));
+        let loaded = 0;
+        for (const [k, v] of Object.entries(raw)) {
+            if (Date.now() - v.time < CACHE_TTL) { cache.set(k, v); loaded++; }
+        }
+        if (loaded) console.log(`[CACHE] Restored ${loaded} entries from disk`);
+    } catch {}
+}
+
+function persistCache() {
+    try {
+        const obj = {};
+        for (const [k, v] of cache.entries()) {
+            if (Date.now() - v.time < CACHE_TTL) obj[k] = v;
+        }
+        fs.writeFileSync(CACHE_FILE, JSON.stringify(obj));
+    } catch (e) { console.error('[CACHE] persist error:', e.message); }
+}
+
+loadCache();
+setInterval(persistCache, 60 * 1000);
 const CTM_AUTH = 'Basic YTgzZDlmMzM3NWY1ZDIyNzEwYWUwMDY2YWNkMzU1YTNkYzdkOjM0ODVjN2Q2ZWFkZWYzOTYzZmY3MWQ3MWVhNTdjM2VlNTQ1MQ==';
 const ACCOUNT_ID = '83';
 const SESSION_SECRET = 'tb-dashboard-2026-results-group-secret-key';
@@ -247,6 +272,7 @@ const server = http.createServer(async (req, res) => {
                         const out = JSON.stringify(data);
                         console.log(`[API] Stripped: ${body.length} → ${out.length} bytes`);
                         cache.set(cacheKey, { body: out, time: Date.now() });
+                        persistCache();
                         res.writeHead(200, { 'Content-Type': 'application/json' });
                         res.end(out);
                     } catch(e) {
@@ -265,6 +291,9 @@ const server = http.createServer(async (req, res) => {
     }
 
     // ── Static Files ──
+    if (pathname === '/.cache.json' || pathname === '/users.json' || pathname === '/targets.json') {
+        res.writeHead(404); res.end('Not Found'); return;
+    }
     let filePath = pathname === '/' ? '/dashboard.html' : pathname;
     filePath = path.join(__dirname, filePath);
     const ext = path.extname(filePath);

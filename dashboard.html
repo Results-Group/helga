@@ -635,6 +635,7 @@
         </div>
         <button class="export-btn" onclick="exportExcel()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> Excel</button>
         <button class="refresh-btn" onclick="refreshData()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg> רענן</button>
+        <button class="export-btn" id="compareBtn" onclick="loadPrevPeriod()" style="display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M3 4l17 17"/></svg> <span id="compareBtnText">טען השוואה</span></button>
     </div>
 </div>
 
@@ -645,7 +646,7 @@
 <div class="toast-container" id="tc"></div>
 
 <script>
-const S = { dateFrom:null, dateTo:null, allCalls:[], prevCalls:[], charts:{}, view:'overview', branchFilter:'', channelFilter:'', tableFilter:'all', tableSearch:'', tablePage:1 };
+const S = { dateFrom:null, dateTo:null, allCalls:[], prevCalls:[], prevLoaded:false, charts:{}, view:'overview', branchFilter:'', channelFilter:'', tableFilter:'all', tableSearch:'', tablePage:1 };
 
 const CH = {
     'google adwords':{n:'Google Ads',c:'#4285f4'},'google ads':{n:'Google Ads',c:'#4285f4'},
@@ -793,7 +794,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
 });
 
 async function api(ep){
-    const ctrl=new AbortController();const tid=setTimeout(()=>ctrl.abort(),15000);
+    const ctrl=new AbortController();const tid=setTimeout(()=>ctrl.abort(),45000);
     try{const r=await fetch(`/api${ep}`,{signal:ctrl.signal});clearTimeout(tid);if(!r.ok)throw new Error(`HTTP ${r.status}`);return r.json();}
     catch(e){clearTimeout(tid);if(e.name==='AbortError')throw new Error('Timeout - השרת לא מגיב');throw e;}
 }
@@ -821,20 +822,29 @@ function getPrevPeriod(){
 }
 
 async function fetchAll(){
-    S.allCalls=[];S.prevCalls=[];
+    S.allCalls=[];S.prevCalls=[];S.prevLoaded=false;
     const lo=_('lo');lo.classList.remove('hidden');
     const sd=fd(S.dateFrom),ed=fd(S.dateTo);
-    const prev=getPrevPeriod();
     try{
-        const [cur,prv]=await Promise.all([
-            fetchRange(sd,ed,'טוען'),
-            fetchRange(fd(prev.from),fd(prev.to),'טוען תקופה קודמת')
-        ]);
-        S.allCalls=cur;S.prevCalls=prv;
+        S.allCalls=await fetchRange(sd,ed,'טוען');
     }catch(e){console.error('fetchAll error:',e);toast(`שגיאה: ${e.message}`,'error');}
     const lb=_('lb');if(lb)lb.style.width='100%';
     setTimeout(()=>lo.classList.add('hidden'),300);
     return S.allCalls;
+}
+
+async function loadPrevPeriod(){
+    if(S.prevLoaded)return;
+    const lo=_('lo');lo.classList.remove('hidden');
+    const prev=getPrevPeriod();
+    try{
+        S.prevCalls=await fetchRange(fd(prev.from),fd(prev.to),'טוען תקופה קודמת');
+        S.prevLoaded=true;
+        toast(`נטענו ${S.prevCalls.length} לידים מתקופה קודמת`,'success');
+    }catch(e){console.error('loadPrev error:',e);toast(`שגיאה: ${e.message}`,'error');}
+    const lb=_('lb');if(lb)lb.style.width='100%';
+    setTimeout(()=>lo.classList.add('hidden'),300);
+    render();
 }
 
 async function refreshData(){
@@ -881,6 +891,8 @@ function updateTitle(){
 
 function render(){
     try{
+        const cb=_('compareBtn'),cbt=_('compareBtnText');
+        if(cb&&cbt){if(S.prevLoaded){cbt.textContent='✓ השוואה נטענה';cb.style.opacity='0.6';cb.style.pointerEvents='none';}else{cbt.textContent='טען השוואה';cb.style.opacity='1';cb.style.pointerEvents='auto';}}
         const calls=fc();
         Object.values(S.charts).forEach(c=>{if(c&&c.destroy)c.destroy();});S.charts={};
         if(!calls.length&&S.allCalls.length>0){
@@ -994,7 +1006,7 @@ function renderOverview(calls){
     h+=`<div class="section"><div class="section-header"><div class="section-title">מדדי ביצוע מרכזיים</div>${tgtBtn}</div><div class="kpi-grid">`;
     const kpis=[
         {icon:IC.leads,bg:'var(--blue-bg)',color:'var(--blue)',val:t,pv:pt,label:'סה"כ פניות',sub:`${uniq} ייחודיים · ממוצע ${dailyAvg} ליום`,click:'all'},
-        {icon:IC.user,bg:'var(--accent-bg)',color:'var(--accent)',val:newLeads.length,pv:pnw,label:'לידים חדשים',sub:`לא הופיעו בתקופה הקודמת`},
+        {icon:IC.user,bg:'var(--accent-bg)',color:'var(--accent)',val:S.prevLoaded?newLeads.length:'—',pv:pnw,label:'לידים חדשים',sub:S.prevLoaded?'לא הופיעו בתקופה הקודמת':'טען השוואה לחישוב',na:S.prevLoaded?0:1,rv:newLeads.length},
         {icon:IC.phone,bg:'var(--cyan-bg)',color:'var(--cyan)',val:ph.length,pv:pph,label:'שיחות טלפון',sub:pct(ph.length,t),click:'call'},
         {icon:IC.form,bg:'var(--pink-bg)',color:'var(--pink)',val:fm.length,pv:pfm,label:'טפסים',sub:pct(fm.length,t),click:'form'},
         {icon:IC.check,bg:'var(--green-bg)',color:'var(--green)',val:an.length,pv:pan,label:'שיחות שנענו',sub:`${ansRate}% מענה`},
@@ -1054,7 +1066,11 @@ function renderOverview(calls){
     h+=`<div class="section"><div class="charts-row"><div class="chart-card"><div class="chart-head"><span class="chart-title">לידים לאורך זמן</span><div class="chart-tabs"><button class="chart-tab active" onclick="switchLeadsChart('all',this)">הכל</button><button class="chart-tab" onclick="switchLeadsChart('calls',this)">שיחות</button><button class="chart-tab" onclick="switchLeadsChart('forms',this)">טפסים</button><button class="chart-tab" onclick="switchLeadsChart('meetings',this)">פגישות</button></div></div><div class="chart-container"><canvas id="leadsC"></canvas></div></div>`;
     h+=`<div class="chart-card"><div class="chart-head"><span class="chart-title">ערוצי שיווק</span></div><div class="chart-container"><canvas id="chC"></canvas></div></div></div></div>`;
 
-    h+=`<div class="section"><div class="section-header"><div class="section-title">השוואה לתקופה קודמת</div></div><div class="chart-card"><div class="chart-container" style="height:280px"><canvas id="compC"></canvas></div></div></div>`;
+    if(S.prevLoaded){
+        h+=`<div class="section"><div class="section-header"><div class="section-title">השוואה לתקופה קודמת</div></div><div class="chart-card"><div class="chart-container" style="height:280px"><canvas id="compC"></canvas></div></div></div>`;
+    } else {
+        h+=`<div class="section"><div class="section-header"><div class="section-title">השוואה לתקופה קודמת</div></div><div class="chart-card" style="text-align:center;padding:40px 20px"><p style="color:var(--text-muted);margin-bottom:16px">נתוני תקופה קודמת לא נטענו. לחץ לטעינה ולהצגת השוואה.</p><button class="refresh-btn" onclick="loadPrevPeriod()" style="margin:auto;display:inline-flex;align-items:center;gap:6px;padding:10px 24px;font-size:14px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M3 4l17 17"/></svg> טען השוואה</button></div></div>`;
+    }
 
     h+=`<div class="section"><div class="charts-row"><div class="chart-card"><div class="chart-head"><span class="chart-title">פילוח לפי שעות</span><div class="chart-tabs"><button class="chart-tab active" onclick="switchHoursChart('leads',this)">לידים</button><button class="chart-tab" onclick="switchHoursChart('missed',this)">לא נענו</button><button class="chart-tab" onclick="switchHoursChart('meetings',this)">פגישות</button></div></div><div class="chart-container"><canvas id="hrsC"></canvas></div></div>`;
     h+=`<div class="list-card"><div class="chart-head"><span class="chart-title">סטטוס CRM</span></div><div id="crmListEl"></div></div></div></div>`;
@@ -1127,7 +1143,7 @@ function renderOverview(calls){
     buildFunnel(calls);
     buildFunnelTrend(calls);
     buildLeadsChart(calls,'all');
-    buildComparisonChart(calls,pv);
+    if(S.prevLoaded)buildComparisonChart(calls,pv);
     buildChChart(calls);
     buildHrsChart(calls,'leads');
     buildCrmList(calls);
