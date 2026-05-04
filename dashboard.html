@@ -1816,7 +1816,28 @@ function renderLifecycleView(calls){
     const avgNZ=arr=>{const nz=nonZero(arr);return nz.length?nz.reduce((s,x)=>s+x.hours,0)/nz.length:0;};
     const medNZ=arr=>{const nz=nonZero(arr).sort((a,b)=>a.hours-b.hours);if(!nz.length)return 0;const m=Math.floor(nz.length/2);return nz.length%2?nz[m].hours:(nz[m-1].hours+nz[m].hours)/2;};
 
-    let h=`<div class="section"><div class="section-header"><div class="section-title">זמן ממוצע בין שלבים</div><span style="font-size:12px;color:var(--text-muted)">מבוסס על ${countUniquePhones(calls)} לידים ייחודיים</span></div>`;
+    // Hero KPI - average time to close
+    const dealNZ=nonZero(lc.toDeal);
+    const avgClose=dealNZ.length?dealNZ.reduce((s,x)=>s+x.hours,0)/dealNZ.length:0;
+    const medClose=medNZ(lc.toDeal);
+    const sdDeals=sameDay(lc.toDeal);
+    let h=`<div class="section"><div class="chart-card" style="text-align:center;padding:32px;border-top:4px solid var(--accent)">`;
+    h+=`<div style="display:flex;justify-content:center;margin-bottom:10px;color:var(--accent)">${IC.money}</div>`;
+    h+=`<div style="font-size:15px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">זמן ממוצע לסגירת לקוח</div>`;
+    if(lc.toDeal.length>0){
+        h+=`<div class="kpi-val" style="font-size:48px;color:var(--accent)">${fmtDays(avgClose)}</div>`;
+        h+=`<div style="font-size:16px;color:var(--text-muted);margin-top:4px">ימים</div>`;
+        h+=`<div style="display:flex;justify-content:center;gap:24px;margin-top:16px;font-size:13px">`;
+        h+=`<div><span style="color:var(--text-muted)">חציון:</span> <b>${fmtDays(medClose)} ימים</b></div>`;
+        h+=`<div><span style="color:var(--text-muted)">עסקאות:</span> <b>${lc.toDeal.length}</b></div>`;
+        if(sdDeals>0)h+=`<div><span style="color:var(--text-muted)">נסגרו באותו יום:</span> <b>${sdDeals}</b></div>`;
+        h+=`</div>`;
+    } else {
+        h+=`<div style="font-size:16px;color:var(--text-muted);padding:20px 0">אין מספיק נתונים</div>`;
+    }
+    h+=`</div></div>`;
+
+    h+=`<div class="section"><div class="section-header"><div class="section-title">זמן ממוצע בין שלבים</div><span style="font-size:12px;color:var(--text-muted)">מבוסס על ${countUniquePhones(calls)} לידים ייחודיים</span></div>`;
 
     h+=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">`;
 
