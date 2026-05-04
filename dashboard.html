@@ -1038,11 +1038,14 @@ function renderOverview(calls){
         h+=`<th class="sortable" onclick="sortTable('branchTable',5,'num',this)"><span class="sort-arrow">↕</span>% תיאום</th>`;
         h+=`<th class="sortable" onclick="sortTable('branchTable',6,'num',this)"><span class="sort-arrow">↕</span>הגיעו</th>`;
         h+=`<th class="sortable" onclick="sortTable('branchTable',7,'num',this)"><span class="sort-arrow">↕</span>% הגעה</th>`;
-        h+=`<th class="sortable" onclick="sortTable('branchTable',8,'num',this)"><span class="sort-arrow">↕</span>הכנסות</th>`;
+        h+=`<th class="sortable" onclick="sortTable('branchTable',8,'num',this)"><span class="sort-arrow">↕</span>עסקאות</th>`;
+        h+=`<th class="sortable" onclick="sortTable('branchTable',9,'num',this)"><span class="sort-arrow">↕</span>% סגירה</th>`;
+        h+=`<th class="sortable" onclick="sortTable('branchTable',10,'num',this)"><span class="sort-arrow">↕</span>הכנסות</th>`;
         h+=`</tr></thead><tbody>`;
         brSorted.forEach(([name,d],i)=>{
             const meetR=d.leads>0?Math.round((d.meetings/d.leads)*100):0;
             const arrR=d.meetings>0?Math.round((d.arrived/d.meetings)*100):0;
+            const dealR=d.arrived>0?Math.round((d.deals/d.arrived)*100):0;
             const avg=Math.round(d.leads/days*10)/10;
             h+=`<tr>`;
             h+=`<td style="font-weight:800;color:${i===0?'var(--green)':i===brSorted.length-1?'var(--red)':'var(--text-muted)'}">${i+1}</td>`;
@@ -1053,6 +1056,8 @@ function renderOverview(calls){
             h+=`<td><span class="badge ${meetR>=TARGETS.meetRate?'badge-green':meetR>=TARGETS.meetRate*0.7?'badge-orange':'badge-red'}">${meetR}%</span></td>`;
             h+=`<td>${d.arrived}</td>`;
             h+=`<td><span class="badge ${arrR>=TARGETS.arrRate?'badge-green':arrR>=TARGETS.arrRate*0.7?'badge-orange':'badge-red'}">${arrR}%</span></td>`;
+            h+=`<td>${d.deals}</td>`;
+            h+=`<td><span class="badge ${dealR>=TARGETS.dealRate?'badge-green':dealR>=TARGETS.dealRate*0.7?'badge-orange':'badge-red'}">${dealR}%</span></td>`;
             h+=`<td style="font-weight:600">₪${d.rev.toLocaleString('he-IL')}</td>`;
             h+=`</tr>`;
         });
