@@ -707,7 +707,7 @@ function fc(){let list=S.allCalls;if(S.branchFilter)list=list.filter(c=>nb(c)===
 function getCN(c){const f=c.form||{};const cf=c.custom_fields||{};return f.campaign_name||cf.campaign_name||c.campaign_name||c.tracking_label||'';}
 function getPL(c){const f=c.form||{};const cf=c.custom_fields||{};return f.platform||cf.platform||c.platform||'';}
 
-function getPhone(c){return c.caller_number_bare||c.caller_number_format||c.contact_number||'';}
+function getPhone(c){return (c.caller_number_bare||c.caller_number_format||c.contact_number||'').replace(/[\s\-\+\(\)]/g,'');}
 function uniqueByPhone(calls){
     const map={};
     calls.forEach(c=>{const p=getPhone(c);if(!p||p.length<6)return;
