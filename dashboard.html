@@ -1725,7 +1725,7 @@ function renderTbl(calls){
     else if(f==='noanswer')list=list.filter(c=>c.dial_status==='no-answer'||c.dial_status==='missed');
     else if(f==='meeting')list=list.filter(isMeet);
     else if(f==='arrived')list=list.filter(isArr);
-    else if(f==='deal')list=list.filter(c=>da(c)>0);
+    else if(f==='deal'){list=list.filter(c=>da(c)>0);const seen={};list=list.filter(c=>{const p=getPhone(c),a=da(c),key=p+'_'+a;if(!p||p.length<6)return true;if(seen[key])return false;seen[key]=true;return true;});}
     const q=S.tableSearch;
     if(q)list=list.filter(c=>(c.name||'').toLowerCase().includes(q)||(c.caller_number||'').includes(q)||(c.source||'').toLowerCase().includes(q)||nb(c).includes(q)||crm(c).includes(q));
 
