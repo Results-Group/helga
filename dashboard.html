@@ -707,6 +707,27 @@ function fc(){let list=S.allCalls;if(S.branchFilter)list=list.filter(c=>nb(c)===
 function getCN(c){const f=c.form||{};const cf=c.custom_fields||{};return f.campaign_name||cf.campaign_name||c.campaign_name||c.tracking_label||'';}
 function getPL(c){const f=c.form||{};const cf=c.custom_fields||{};return f.platform||cf.platform||c.platform||'';}
 
+function getPhone(c){return c.caller_number_bare||c.caller_number_format||c.contact_number||'';}
+function uniqueByPhone(calls){
+    const map={};
+    calls.forEach(c=>{const p=getPhone(c);if(!p||p.length<6)return;
+        if(!map[p])map[p]=c;
+        else{if(da(c)>da(map[p]))map[p]=c;else if(da(c)===da(map[p])&&(pd(c.called_at)||0)>(pd(map[p].called_at)||0))map[p]=c;}
+    });
+    return Object.values(map);
+}
+function countUniquePhones(calls){
+    const set=new Set();calls.forEach(c=>{const p=getPhone(c);if(p&&p.length>=6)set.add(p);});return set.size;
+}
+function getNewLeads(calls,prevCalls){
+    const prevPhones=new Set();prevCalls.forEach(c=>{const p=getPhone(c);if(p&&p.length>=6)prevPhones.add(p);});
+    const seen=new Set();
+    return calls.filter(c=>{const p=getPhone(c);if(!p||p.length<6)return false;if(seen.has(p))return false;seen.add(p);return !prevPhones.has(p);});
+}
+function dedupDeals(calls){
+    return uniqueByPhone(calls.filter(c=>da(c)>0));
+}
+
 function isDark(){return document.body.classList.contains('dark');}
 function toggleDark(){
     document.body.classList.toggle('dark');
@@ -938,13 +959,16 @@ function renderOverview(calls){
     const pv=S.prevCalls.filter(c=>{if(S.branchFilter&&nb(c)!==S.branchFilter)return false;if(S.channelFilter&&gCh(c).n!==S.channelFilter)return false;return true;});
     const t=calls.length,ph=calls.filter(isC),fm=calls.filter(isF),an=calls.filter(isA),mi=calls.filter(isM);
     const nw=calls.filter(c=>c.is_new_caller),mt=calls.filter(isMeet);
-    const ar=calls.filter(isArr),dl=calls.filter(c=>da(c)>0);
-    const tr=calls.reduce((s,c)=>s+da(c),0),tpd=calls.reduce((s,c)=>s+dp(c),0);
+    const ar=calls.filter(isArr),dlRaw=calls.filter(c=>da(c)>0);
+    const dl=dedupDeals(calls);
+    const tr=dl.reduce((s,c)=>s+da(c),0),tpd=dl.reduce((s,c)=>s+dp(c),0);
+    const uniq=countUniquePhones(calls);
+    const newLeads=getNewLeads(calls,pv);
 
     const pt=pv.length,pph=pv.filter(isC).length,pfm=pv.filter(isF).length,pan=pv.filter(isA).length,pmi=pv.filter(isM).length;
-    const pnw=pv.filter(c=>c.is_new_caller).length,pmt=pv.filter(isMeet).length;
-    const par=pv.filter(isArr).length,pdl=pv.filter(c=>da(c)>0).length;
-    const ptr=pv.reduce((s,c)=>s+da(c),0),ppd=pv.reduce((s,c)=>s+dp(c),0);
+    const pnw=getNewLeads(pv,[]).length,pmt=pv.filter(isMeet).length;
+    const par=pv.filter(isArr).length,pdl=dedupDeals(pv).length;
+    const ptr=dedupDeals(pv).reduce((s,c)=>s+da(c),0),ppd=dedupDeals(pv).reduce((s,c)=>s+dp(c),0);
 
     const days=Math.max(1,Math.round((S.dateTo-S.dateFrom)/(1000*60*60*24))+1);
     const dailyAvg=Math.round(t/days*10)/10;
@@ -964,15 +988,15 @@ function renderOverview(calls){
     const tgtBtn=USER_ROLE==='admin'?`<button class="targets-edit-btn" onclick="openTargetsModal()">✎ ערוך יעדים</button>`:'';
     h+=`<div class="section"><div class="section-header"><div class="section-title">מדדי ביצוע מרכזיים</div>${tgtBtn}</div><div class="kpi-grid">`;
     const kpis=[
-        {icon:IC.leads,bg:'var(--blue-bg)',color:'var(--blue)',val:t,pv:pt,label:'סה"כ לידים',sub:`ממוצע ${dailyAvg} ליום`,click:'all'},
+        {icon:IC.leads,bg:'var(--blue-bg)',color:'var(--blue)',val:t,pv:pt,label:'סה"כ פניות',sub:`${uniq} ייחודיים · ממוצע ${dailyAvg} ליום`,click:'all'},
+        {icon:IC.user,bg:'var(--accent-bg)',color:'var(--accent)',val:newLeads.length,pv:pnw,label:'לידים חדשים',sub:`לא הופיעו בתקופה הקודמת`},
         {icon:IC.phone,bg:'var(--cyan-bg)',color:'var(--cyan)',val:ph.length,pv:pph,label:'שיחות טלפון',sub:pct(ph.length,t),click:'call'},
         {icon:IC.form,bg:'var(--pink-bg)',color:'var(--pink)',val:fm.length,pv:pfm,label:'טפסים',sub:pct(fm.length,t),click:'form'},
         {icon:IC.check,bg:'var(--green-bg)',color:'var(--green)',val:an.length,pv:pan,label:'שיחות שנענו',sub:`${ansRate}% מענה`},
         {icon:IC.xmark,bg:'var(--red-bg)',color:'var(--red)',val:mi.length,pv:pmi,label:'לא נענו',sub:pct(mi.length,Math.max(ph.length,1)),inv:1,click:'noanswer'},
-        {icon:IC.user,bg:'var(--orange-bg)',color:'var(--orange)',val:nw.length,pv:pnw,label:'לידים חדשים',sub:pct(nw.length,t)},
         {icon:IC.calendar,bg:'var(--green-bg)',color:'var(--green)',val:mt.length,pv:pmt,label:'פגישות שנקבעו',sub:`${convRate}% מלידים`,tg:targetGauge(convRate,TARGETS.meetRate,'תיאום'),click:'meeting'},
         {icon:IC.building,bg:'var(--gold-bg)',color:'var(--gold)',val:ar.length,pv:par,label:'הגיעו לפגישה',sub:`${arrRate}% מפגישות`,tg:targetGauge(arrRate,TARGETS.arrRate,'הגעה'),click:'arrived'},
-        {icon:IC.money,bg:'var(--purple-bg)',color:'var(--purple)',val:dl.length,pv:pdl,label:'עסקאות',sub:dl.length?`ממוצע ₪${Math.round(tr/dl.length).toLocaleString('he-IL')} · ${dealRate}% המרה`:'',tg:dl.length||ar.length?targetGauge(ar.length>0?Math.round((dl.length/ar.length)*1000)/10:0,TARGETS.dealRate,'עסקה'):null,click:'deal'},
+        {icon:IC.money,bg:'var(--purple-bg)',color:'var(--purple)',val:dl.length,pv:pdl,label:'עסקאות (ייחודיות)',sub:dl.length?`ממוצע ₪${Math.round(tr/dl.length).toLocaleString('he-IL')} · ${dealRate}% המרה`:'',tg:dl.length||ar.length?targetGauge(ar.length>0?Math.round((dl.length/ar.length)*1000)/10:0,TARGETS.dealRate,'עסקה'):null,click:'deal'},
         {icon:IC.money,bg:'var(--purple-bg)',color:'var(--purple)',val:'₪'+tr.toLocaleString('he-IL'),pv:ptr,rv:tr,label:'מחזור עסקאות',sub:'',na:1},
         {icon:IC.wallet,bg:'var(--green-bg)',color:'var(--green)',val:'₪'+tpd.toLocaleString('he-IL'),pv:ppd,rv:tpd,label:'שולם בפועל',sub:tr>0?Math.round((tpd/tr)*100)+'% גבייה':'',na:1},
     ];
