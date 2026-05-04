@@ -432,6 +432,109 @@
             #userBadge { display: none !important; }
             .branch-metrics { grid-template-columns: repeat(2, 1fr); }
         }
+
+        /* ── Alerts Panel ── */
+        .alerts-panel { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .alert-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            border-radius: var(--radius-sm); font-size: 13px; font-weight: 500;
+            animation: alertSlideIn 0.3s ease;
+        }
+        .alert-item.alert-red { background: var(--red-bg); border: 1px solid rgba(239,68,68,0.2); color: var(--red); }
+        .alert-item.alert-orange { background: var(--orange-bg); border: 1px solid rgba(245,158,11,0.2); color: var(--orange); }
+        .alert-item.alert-blue { background: var(--blue-bg); border: 1px solid rgba(59,130,246,0.2); color: var(--blue); }
+        .alert-item.alert-green { background: var(--green-bg); border: 1px solid rgba(16,185,129,0.2); color: var(--green); }
+        .alert-icon { width: 22px; height: 22px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .alert-text { flex: 1; }
+        .alert-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: rgba(0,0,0,0.08); white-space: nowrap; }
+        body.dark .alert-badge { background: rgba(255,255,255,0.08); }
+        @keyframes alertSlideIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* ── Targets Modal ── */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000;
+            display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(4px); animation: fadeIn 0.2s ease;
+        }
+        .modal-box {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 28px; width: 420px; max-width: 90vw; box-shadow: var(--shadow-lg);
+            animation: modalPop 0.25s ease;
+        }
+        .modal-title { font-size: 18px; font-weight: 800; margin-bottom: 20px; }
+        .modal-field { margin-bottom: 16px; }
+        .modal-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block; }
+        .modal-input {
+            width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+            background: var(--bg); color: var(--text); font-family: inherit; font-size: 14px; font-weight: 600;
+        }
+        .modal-input:focus { outline: none; border-color: var(--accent); }
+        .modal-actions { display: flex; gap: 8px; margin-top: 20px; }
+        .modal-btn {
+            flex: 1; padding: 10px; border: none; border-radius: var(--radius-sm);
+            font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s;
+        }
+        .modal-btn-primary { background: var(--accent); color: #fff; }
+        .modal-btn-primary:hover { background: var(--accent-light); }
+        .modal-btn-cancel { background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); }
+        .modal-btn-cancel:hover { border-color: var(--text-muted); }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes modalPop { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        /* ── Insights ── */
+        .insight-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 20px 24px; box-shadow: var(--shadow-sm); display: flex; align-items: flex-start; gap: 14px;
+            transition: all 0.2s;
+        }
+        .insight-card:hover { box-shadow: var(--shadow); }
+        .insight-icon {
+            width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center; font-size: 18px;
+        }
+        .insight-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+        .insight-text { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .insight-metric { font-size: 20px; font-weight: 800; margin-top: 6px; }
+
+        /* ── Lead Timeline ── */
+        .timeline-drawer {
+            position: fixed; left: 0; top: 0; width: 420px; height: 100vh;
+            background: var(--bg-card); border-right: 1px solid var(--border);
+            z-index: 1001; box-shadow: var(--shadow-lg); overflow-y: auto; padding: 24px;
+            animation: slideInLeft 0.3s ease;
+        }
+        .timeline-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1000; }
+        .timeline-close {
+            position: absolute; top: 16px; left: 16px; width: 32px; height: 32px;
+            border-radius: 50%; background: var(--bg); border: 1px solid var(--border);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            color: var(--text-secondary); font-size: 16px; transition: all 0.15s;
+        }
+        .timeline-close:hover { background: var(--red-bg); color: var(--red); border-color: var(--red); }
+        .timeline-header { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+        .timeline-name { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+        .timeline-phone { font-size: 14px; color: var(--text-muted); direction: ltr; display: inline-block; }
+        .tl-item {
+            position: relative; padding: 12px 0 12px 24px; border-right: 2px solid var(--border);
+            margin-right: 10px;
+        }
+        .tl-item:last-child { border-right-color: transparent; }
+        .tl-dot {
+            position: absolute; right: -6px; top: 16px; width: 10px; height: 10px;
+            border-radius: 50%; border: 2px solid var(--bg-card);
+        }
+        .tl-time { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+        .tl-desc { font-size: 13px; font-weight: 500; }
+        .tl-meta { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+        @keyframes slideInLeft { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+        @media (max-width: 480px) { .timeline-drawer { width: 100%; } }
+
+        .targets-edit-btn {
+            background: none; border: 1px dashed var(--border); border-radius: 6px;
+            padding: 3px 8px; font-size: 10px; color: var(--text-muted); cursor: pointer;
+            font-family: inherit; transition: all 0.15s;
+        }
+        .targets-edit-btn:hover { border-color: var(--accent); color: var(--accent); }
     </style>
 </head>
 <body>
@@ -487,6 +590,10 @@
     <button class="sidebar-item" onclick="setView('leads')" data-view="leads">
         <span class="sidebar-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg></span>
         <span>לידים</span>
+    </button>
+    <button class="sidebar-item" onclick="setView('insights')" data-view="insights">
+        <span class="sidebar-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span>
+        <span>תובנות</span>
     </button>
 </nav>
 
@@ -544,7 +651,7 @@ const CH = {
     'direct or unknown':{n:'אורגני / ישיר',c:'#8b5cf6'},
 };
 const BC = ['#4f6ef7','#10b981','#f59e0b','#ec4899','#06b6d4','#8b5cf6'];
-const TARGETS = { meetRate:50, arrRate:30, dealRate:40 };
+let TARGETS = { meetRate:50, arrRate:30, dealRate:40 };
 const IC = {
     leads:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg>',
     phone:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>',
@@ -631,10 +738,32 @@ async function checkAuth(){
 }
 async function doLogout(){await fetch('/auth/logout');window.location.href='/login.html';}
 
+async function loadTargets(){
+    try{const r=await fetch('/auth/targets');if(r.ok){const d=await r.json();TARGETS.meetRate=d.meetRate||50;TARGETS.arrRate=d.arrRate||30;TARGETS.dealRate=d.dealRate||40;}}catch{}
+}
+async function saveTargetsToServer(mt,ar,dl){
+    try{const r=await fetch('/auth/targets/update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({meetRate:mt,arrRate:ar,dealRate:dl})});
+    if(r.ok){const d=await r.json();TARGETS.meetRate=d.meetRate;TARGETS.arrRate=d.arrRate;TARGETS.dealRate=d.dealRate;render();toast('היעדים עודכנו בהצלחה','success');}
+    else toast('שגיאה בשמירת יעדים','error');}catch{toast('שגיאה בשמירת יעדים','error');}
+}
+function openTargetsModal(){
+    const o=document.createElement('div');o.className='modal-overlay';o.id='targetsModal';
+    o.innerHTML=`<div class="modal-box"><div class="modal-title">הגדרת יעדים</div>
+    <div class="modal-field"><label class="modal-label">יעד אחוז תיאום פגישות</label><input class="modal-input" type="number" id="tgtMeet" min="0" max="100" value="${TARGETS.meetRate}"><div style="font-size:11px;color:var(--text-muted);margin-top:4px">כמה אחוז מהלידים צריכים להפוך לפגישה?</div></div>
+    <div class="modal-field"><label class="modal-label">יעד אחוז הגעה לפגישה</label><input class="modal-input" type="number" id="tgtArr" min="0" max="100" value="${TARGETS.arrRate}"><div style="font-size:11px;color:var(--text-muted);margin-top:4px">כמה אחוז מהפגישות צריכים להגיע?</div></div>
+    <div class="modal-field"><label class="modal-label">יעד אחוז סגירת עסקאות</label><input class="modal-input" type="number" id="tgtDeal" min="0" max="100" value="${TARGETS.dealRate}"><div style="font-size:11px;color:var(--text-muted);margin-top:4px">כמה אחוז מהמגיעים צריכים לסגור עסקה?</div></div>
+    <div class="modal-actions"><button class="modal-btn modal-btn-primary" onclick="saveTargetsFromModal()">שמור יעדים</button><button class="modal-btn modal-btn-cancel" onclick="closeTargetsModal()">ביטול</button></div></div>`;
+    document.body.appendChild(o);
+    o.addEventListener('click',e=>{if(e.target===o)closeTargetsModal();});
+}
+function closeTargetsModal(){const m=_('targetsModal');if(m)m.remove();}
+function saveTargetsFromModal(){const mt=parseInt(_('tgtMeet')?.value)||0,ar=parseInt(_('tgtArr')?.value)||0,dl=parseInt(_('tgtDeal')?.value)||0;closeTargetsModal();saveTargetsToServer(mt,ar,dl);}
+
 document.addEventListener('DOMContentLoaded',async()=>{
     updateDarkBtn();
     const ok=await checkAuth();
     if(!ok)return;
+    await loadTargets();
     setDP('thisMonth');
 });
 
@@ -716,7 +845,7 @@ function setChannelFilter(ch){
 }
 
 function updateTitle(){
-    const titles={'overview':'סקירה שיווקית','funnel':'מדדי משפך','branches':'ביצועים לפי סניף','channels':'ביצועים לפי ערוץ','campaigns':'ביצועים לפי קמפיין','leads':'רשימת לידים'};
+    const titles={'overview':'סקירה שיווקית','funnel':'מדדי משפך','branches':'ביצועים לפי סניף','channels':'ביצועים לפי ערוץ','campaigns':'ביצועים לפי קמפיין','leads':'רשימת לידים','insights':'תובנות חכמות'};
     let t=titles[S.view]||'סקירה שיווקית';
     const filters=[];
     if(S.branchFilter)filters.push(S.branchFilter);
@@ -744,6 +873,7 @@ function render(){
         else if(v==='channels')renderChannelsView(calls);
         else if(v==='campaigns')renderCampaignsView(calls);
         else if(v==='leads')renderLeadsView(calls);
+        else if(v==='insights')renderInsightsView(calls);
     }catch(e){
         console.error('render error:',e);
         _('lo').classList.add('hidden');
@@ -772,6 +902,38 @@ function targetGauge(actual,target,label){
     return`<div class="target-gauge"><div class="target-bar-wrap"><div class="target-bar-fill" style="width:${fillW}%;background:${color}"></div><div class="target-marker" style="right:auto;left:${100-markerPos}%" title="יעד: ${target}%"></div></div><div class="target-labels"><span class="target-status ${hit?'hit':'miss'}">${actual}% ${hit?'✓':'✗'}</span><span class="target-label">יעד: ${target}%</span></div></div>`;
 }
 
+function generateAlerts(calls,pv){
+    const alerts=[];
+    const t=calls.length,mt=calls.filter(isMeet),ar=calls.filter(isArr);
+    const convRate=t>0?Math.round((mt.length/t)*100):0;
+    const arrRate=mt.length>0?Math.round((ar.length/mt.length)*100):0;
+    const mi=calls.filter(isM);
+
+    if(convRate<TARGETS.meetRate)alerts.push({type:'red',icon:'⚠',text:`אחוז תיאום פגישות (${convRate}%) נמוך מהיעד (${TARGETS.meetRate}%)`,badge:'מתחת ליעד'});
+    if(arrRate<TARGETS.arrRate&&mt.length>0)alerts.push({type:'orange',icon:'⚠',text:`אחוז הגעה לפגישה (${arrRate}%) נמוך מהיעד (${TARGETS.arrRate}%)`,badge:'מתחת ליעד'});
+
+    const noFollowUp=calls.filter(c=>{const s=crm(c);return !s||s==='אין מענה';});
+    const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
+    const noFUYesterday=noFollowUp.filter(c=>{const d=pd(c.called_at);return d&&d<yesterday;});
+    if(noFUYesterday.length>0)alerts.push({type:'orange',icon:'📋',text:`${noFUYesterday.length} לידים ללא מעקב (מעל 24 שעות)`,badge:'דורש טיפול'});
+
+    let maxConsecMissed=0,curConsec=0;
+    const sorted=[...calls].sort((a,b)=>(pd(a.called_at)||0)-(pd(b.called_at)||0));
+    sorted.forEach(c=>{if(isM(c)){curConsec++;maxConsecMissed=Math.max(maxConsecMissed,curConsec);}else curConsec=0;});
+    if(maxConsecMissed>=5)alerts.push({type:'red',icon:'📵',text:`${maxConsecMissed} שיחות לא נענו ברצף — ייתכן שמשהו תקוע`,badge:'בדיקה נדרשת'});
+
+    const ooh=calls.filter(c=>{const d=pd(c.called_at);if(!d)return false;const h=d.getHours(),dw=d.getDay();return dw===6||h<8||h>=18;});
+    const oohNoFU=ooh.filter(c=>{const s=crm(c);return !s||s==='אין מענה';});
+    if(oohNoFU.length>=3)alerts.push({type:'blue',icon:'🌙',text:`${oohNoFU.length} לידים מחוץ לשעות פעילות ללא מעקב`,badge:'מחוץ לשעות'});
+
+    if(pv.length>0&&t>0){
+        const pvConv=pv.length>0?Math.round((pv.filter(isMeet).length/pv.length)*100):0;
+        if(convRate>pvConv+10)alerts.push({type:'green',icon:'📈',text:`שיפור של ${convRate-pvConv}% באחוז תיאום לעומת תקופה קודמת`,badge:'מגמה חיובית'});
+    }
+
+    return alerts;
+}
+
 function renderOverview(calls){
     const pv=S.prevCalls.filter(c=>{if(S.branchFilter&&nb(c)!==S.branchFilter)return false;if(S.channelFilter&&gCh(c).n!==S.channelFilter)return false;return true;});
     const t=calls.length,ph=calls.filter(isC),fm=calls.filter(isF),an=calls.filter(isA),mi=calls.filter(isM);
@@ -791,7 +953,16 @@ function renderOverview(calls){
     const dealRate=t>0?Math.round((dl.length/t)*1000)/10:0;
     const ansRate=ph.length>0?Math.round((an.length/ph.length)*1000)/10:0;
 
-    let h=`<div class="section"><div class="section-header"><div class="section-title">מדדי ביצוע מרכזיים</div></div><div class="kpi-grid">`;
+    let h='';
+    const alerts=generateAlerts(calls,pv);
+    if(alerts.length){
+        h+=`<div class="alerts-panel">`;
+        alerts.forEach(a=>{h+=`<div class="alert-item alert-${a.type}"><span class="alert-icon">${a.icon}</span><span class="alert-text">${a.text}</span><span class="alert-badge">${a.badge}</span></div>`;});
+        h+=`</div>`;
+    }
+
+    const tgtBtn=USER_ROLE==='admin'?`<button class="targets-edit-btn" onclick="openTargetsModal()">✎ ערוך יעדים</button>`:'';
+    h+=`<div class="section"><div class="section-header"><div class="section-title">מדדי ביצוע מרכזיים</div>${tgtBtn}</div><div class="kpi-grid">`;
     const kpis=[
         {icon:IC.leads,bg:'var(--blue-bg)',color:'var(--blue)',val:t,pv:pt,label:'סה"כ לידים',sub:`ממוצע ${dailyAvg} ליום`,click:'all'},
         {icon:IC.phone,bg:'var(--cyan-bg)',color:'var(--cyan)',val:ph.length,pv:pph,label:'שיחות טלפון',sub:pct(ph.length,t),click:'call'},
@@ -853,6 +1024,8 @@ function renderOverview(calls){
 
     h+=`<div class="section"><div class="charts-row"><div class="chart-card"><div class="chart-head"><span class="chart-title">לידים לאורך זמן</span><div class="chart-tabs"><button class="chart-tab active" onclick="switchLeadsChart('all',this)">הכל</button><button class="chart-tab" onclick="switchLeadsChart('calls',this)">שיחות</button><button class="chart-tab" onclick="switchLeadsChart('forms',this)">טפסים</button><button class="chart-tab" onclick="switchLeadsChart('meetings',this)">פגישות</button></div></div><div class="chart-container"><canvas id="leadsC"></canvas></div></div>`;
     h+=`<div class="chart-card"><div class="chart-head"><span class="chart-title">ערוצי שיווק</span></div><div class="chart-container"><canvas id="chC"></canvas></div></div></div></div>`;
+
+    h+=`<div class="section"><div class="section-header"><div class="section-title">השוואה לתקופה קודמת</div></div><div class="chart-card"><div class="chart-container" style="height:280px"><canvas id="compC"></canvas></div></div></div>`;
 
     h+=`<div class="section"><div class="charts-row"><div class="chart-card"><div class="chart-head"><span class="chart-title">פילוח לפי שעות</span><div class="chart-tabs"><button class="chart-tab active" onclick="switchHoursChart('leads',this)">לידים</button><button class="chart-tab" onclick="switchHoursChart('missed',this)">לא נענו</button><button class="chart-tab" onclick="switchHoursChart('meetings',this)">פגישות</button></div></div><div class="chart-container"><canvas id="hrsC"></canvas></div></div>`;
     h+=`<div class="list-card"><div class="chart-head"><span class="chart-title">סטטוס CRM</span></div><div id="crmListEl"></div></div></div></div>`;
@@ -925,6 +1098,7 @@ function renderOverview(calls){
     buildFunnel(calls);
     buildFunnelTrend(calls);
     buildLeadsChart(calls,'all');
+    buildComparisonChart(calls,pv);
     buildChChart(calls);
     buildHrsChart(calls,'leads');
     buildCrmList(calls);
@@ -1285,6 +1459,23 @@ function buildLeadsChart(calls,mode='all'){
     S.charts.leads=new Chart(ctx,{type:'line',data:{labels,datasets},options:co(true)});
 }
 
+function buildComparisonChart(calls,prevCalls){
+    const days=Math.max(1,Math.round((S.dateTo-S.dateFrom)/(1000*60*60*24))+1);
+    const curDaily={},prevDaily={};
+    calls.forEach(c=>{const d=pd(c.called_at);if(!d)return;const diff=Math.floor((d-S.dateFrom)/(1000*60*60*24));if(diff>=0&&diff<days)curDaily[diff]=(curDaily[diff]||0)+1;});
+    const prev=getPrevPeriod();
+    prevCalls.forEach(c=>{const d=pd(c.called_at);if(!d)return;const diff=Math.floor((d-prev.from)/(1000*60*60*24));if(diff>=0&&diff<days)prevDaily[diff]=(prevDaily[diff]||0)+1;});
+    const labels=[];for(let i=0;i<days;i++){const d=new Date(S.dateFrom);d.setDate(d.getDate()+i);labels.push(d.toLocaleDateString('he-IL',{day:'numeric',month:'short'}));}
+    const curData=[],prevData=[];
+    for(let i=0;i<days;i++){curData.push(curDaily[i]||0);prevData.push(prevDaily[i]||0);}
+    const ctx=document.getElementById('compC');if(!ctx)return;
+    const dk=isDark();
+    S.charts.comp=new Chart(ctx,{type:'line',data:{labels,datasets:[
+        {label:'תקופה נוכחית',data:curData,borderColor:'#4f6ef7',backgroundColor:'rgba(79,110,247,0.08)',fill:true,tension:0.4,pointRadius:2,borderWidth:2.5},
+        {label:'תקופה קודמת',data:prevData,borderColor:'#9ca3af',backgroundColor:'rgba(156,163,175,0.06)',fill:true,tension:0.4,pointRadius:2,borderWidth:2,borderDash:[5,4]}
+    ]},options:{...co(true),interaction:{mode:'index',intersect:false}}});
+}
+
 function buildChChart(calls){
     const counts={};calls.forEach(c=>{const ch=gCh(c);counts[ch.n]=counts[ch.n]||{v:0,c:ch.c};counts[ch.n].v++;});
     const sorted=Object.entries(counts).sort((a,b)=>b[1].v-a[1].v).slice(0,8);
@@ -1524,13 +1715,150 @@ function renderTbl(calls){
         const date=pd(c.called_at),ds=date?date.toLocaleString('he-IL',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
         const fm=isF(c),ch=gCh(c),br=nb(c),cs=crm(c),cm=CRMM[cs]||{b:'badge-gray'},deal=da(c);
         const audioUrl=c.audio||'';
-        const audioCell=audioUrl?`<button class="audio-btn" onclick="toggleAudio(this,'${esc(audioUrl)}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> השמע</button>`:'—';
-        return`<tr><td style="white-space:nowrap">${ds}</td><td><span class="badge ${fm?'badge-pink':'badge-blue'}">${fm?'טופס':'שיחה'}</span></td><td>${esc(c.name||c.cnam||'—')}</td><td style="direction:ltr;text-align:right;white-space:nowrap">${esc(c.caller_number_format||c.caller_number||c.contact_number||'—')}</td><td><span class="badge" style="background:${ch.c}12;color:${ch.c}">${esc(ch.n)}</span></td><td style="font-size:11px">${esc(br||'—')}</td><td>${cs?`<span class="badge ${cm.b}">${esc(cs)}</span>`:'—'}</td><td>${deal>0?`<span style="color:var(--green);font-weight:700">₪${deal.toLocaleString('he-IL')}</span>`:'—'}</td><td>${audioCell}</td></tr>`;
+        const audioCell=audioUrl?`<button class="audio-btn" onclick="event.stopPropagation();toggleAudio(this,'${esc(audioUrl)}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> השמע</button>`:'—';
+        const phone=c.caller_number_bare||c.caller_number_format||c.contact_number||'';
+        const nameStr=c.name||c.cnam||'';
+        return`<tr style="cursor:pointer" onclick="showLeadTimeline('${esc(phone)}','${esc(nameStr)}')"><td style="white-space:nowrap">${ds}</td><td><span class="badge ${fm?'badge-pink':'badge-blue'}">${fm?'טופס':'שיחה'}</span></td><td>${esc(nameStr||'—')}</td><td style="direction:ltr;text-align:right;white-space:nowrap">${esc(c.caller_number_format||c.caller_number||c.contact_number||'—')}</td><td><span class="badge" style="background:${ch.c}12;color:${ch.c}">${esc(ch.n)}</span></td><td style="font-size:11px">${esc(br||'—')}</td><td>${cs?`<span class="badge ${cm.b}">${esc(cs)}</span>`:'—'}</td><td>${deal>0?`<span style="color:var(--green);font-weight:700">₪${deal.toLocaleString('he-IL')}</span>`:'—'}</td><td>${audioCell}</td></tr>`;
     }).join('');
 
     const pe=_('pg');if(!pe)return;
     if(tp<=1){pe.innerHTML='';return;}
     pe.innerHTML=`<button ${S.tablePage===1?'disabled':''} onclick="S.tablePage--;renderTbl(fc())">→ הקודם</button><span class="page-info">עמוד ${S.tablePage} מתוך ${tp}</span><button ${S.tablePage===tp?'disabled':''} onclick="S.tablePage++;renderTbl(fc())">הבא ←</button>`;
+}
+
+// ═══ INSIGHTS VIEW ═══
+function renderInsightsView(calls){
+    const pv=S.prevCalls.filter(c=>{if(S.branchFilter&&nb(c)!==S.branchFilter)return false;if(S.channelFilter&&gCh(c).n!==S.channelFilter)return false;return true;});
+    const t=calls.length,mt=calls.filter(isMeet),ar=calls.filter(isArr),dl=calls.filter(c=>da(c)>0);
+    const rev=calls.reduce((s,c)=>s+da(c),0);
+    const days=Math.max(1,Math.round((S.dateTo-S.dateFrom)/(1000*60*60*24))+1);
+    const insights=[];
+
+    // Best channel
+    const chData={};calls.forEach(c=>{const ch=gCh(c);if(!chData[ch.n])chData[ch.n]={leads:0,meetings:0,rev:0};chData[ch.n].leads++;if(isMeet(c))chData[ch.n].meetings++;chData[ch.n].rev+=da(c);});
+    const chSorted=Object.entries(chData).sort((a,b)=>b[1].meetings-a[1].meetings);
+    if(chSorted.length)insights.push({icon:'🏆',bg:'var(--gold-bg)',color:'var(--gold)',title:'הערוץ הכי ממיר',text:`<b>${esc(chSorted[0][0])}</b> הביא ${chSorted[0][1].meetings} פגישות מתוך ${chSorted[0][1].leads} לידים (${chSorted[0][1].leads>0?Math.round((chSorted[0][1].meetings/chSorted[0][1].leads)*100):0}% המרה)`,metric:''});
+
+    // Best day
+    const dayNames=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+    const dayCounts=new Array(7).fill(0);calls.forEach(c=>{const d=pd(c.called_at);if(d)dayCounts[d.getDay()]++;});
+    const bestDay=dayCounts.indexOf(Math.max(...dayCounts));
+    insights.push({icon:'📅',bg:'var(--blue-bg)',color:'var(--blue)',title:'היום הכי חזק',text:`יום <b>${dayNames[bestDay]}</b> הוא היום עם הכי הרבה לידים (${dayCounts[bestDay]} לידים)`,metric:''});
+
+    // Peak hour
+    const hrCounts=new Array(24).fill(0);calls.forEach(c=>{const d=pd(c.called_at);if(d)hrCounts[d.getHours()]++;});
+    const peakHr=hrCounts.indexOf(Math.max(...hrCounts));
+    insights.push({icon:'⏰',bg:'var(--cyan-bg)',color:'var(--cyan)',title:'שעת שיא',text:`רוב הלידים מגיעים בשעה <b>${String(peakHr).padStart(2,'0')}:00</b> (${hrCounts[peakHr]} לידים). כדאי לוודא שיש מענה מלא בשעה הזו.`,metric:''});
+
+    // Out of hours without follow-up
+    const ooh=calls.filter(c=>{const d=pd(c.called_at);if(!d)return false;const h=d.getHours(),dw=d.getDay();return dw===6||h<8||h>=18;});
+    const oohNoFU=ooh.filter(c=>{const s=crm(c);return !s||s==='אין מענה';});
+    if(oohNoFU.length>0)insights.push({icon:'🌙',bg:'var(--orange-bg)',color:'var(--orange)',title:'לידים מחוץ לשעות',text:`${oohNoFU.length} לידים הגיעו מחוץ לשעות פעילות <b>ולא קיבלו מעקב</b>. חזרה מהירה יכולה להציל עסקאות.`,metric:''});
+
+    // Conversion vs target
+    const convRate=t>0?Math.round((mt.length/t)*100):0;
+    if(convRate<TARGETS.meetRate)insights.push({icon:'📉',bg:'var(--red-bg)',color:'var(--red)',title:'פער מהיעד',text:`אחוז התיאום עומד על <b>${convRate}%</b> — צריך עוד <b>${Math.ceil(t*(TARGETS.meetRate/100))-mt.length}</b> פגישות כדי לעמוד ביעד של ${TARGETS.meetRate}%.`,metric:''});
+    else insights.push({icon:'🎯',bg:'var(--green-bg)',color:'var(--green)',title:'עמידה ביעד!',text:`אחוז תיאום של <b>${convRate}%</b> — מעל היעד (${TARGETS.meetRate}%). עבודה מצוינת!`,metric:''});
+
+    // Period comparison
+    if(pv.length>0){
+        const diff=t-pv.length;const pctDiff=pv.length>0?Math.round(Math.abs(diff)/pv.length*100):0;
+        if(diff>0)insights.push({icon:'📈',bg:'var(--green-bg)',color:'var(--green)',title:'מגמה חיובית',text:`עלייה של <b>${pctDiff}%</b> בלידים (${t} מול ${pv.length} בתקופה קודמת). ${diff>10?'שיפור משמעותי!':'ממשיכים בכיוון הנכון.'}`,metric:''});
+        else if(diff<0)insights.push({icon:'📉',bg:'var(--red-bg)',color:'var(--red)',title:'ירידה בלידים',text:`ירידה של <b>${pctDiff}%</b> בלידים (${t} מול ${pv.length} בתקופה קודמת). כדאי לבדוק את הקמפיינים.`,metric:''});
+    }
+
+    // Revenue insight
+    if(rev>0){
+        const avgDeal=dl.length>0?Math.round(rev/dl.length):0;
+        insights.push({icon:'💰',bg:'var(--purple-bg)',color:'var(--purple)',title:'מחזור הכנסות',text:`סגרת <b>${dl.length} עסקאות</b> בסכום כולל של <b>₪${rev.toLocaleString('he-IL')}</b>. ממוצע לעסקה: ₪${avgDeal.toLocaleString('he-IL')}.`,metric:''});
+    }
+
+    // Best branch
+    const brData={};calls.forEach(c=>{const b=nb(c);if(!brData[b])brData[b]={leads:0,meetings:0};brData[b].leads++;if(isMeet(c))brData[b].meetings++;});
+    const brSorted=Object.entries(brData).sort((a,b)=>{const ra=a[1].leads>0?a[1].meetings/a[1].leads:0;const rb=b[1].leads>0?b[1].meetings/b[1].leads:0;return rb-ra;});
+    if(brSorted.length>1){const best=brSorted[0];const rate=best[1].leads>0?Math.round((best[1].meetings/best[1].leads)*100):0;
+    insights.push({icon:'🏢',bg:'var(--accent-bg)',color:'var(--accent)',title:'הסניף המוביל',text:`<b>${esc(best[0])}</b> מוביל באחוזי המרה עם ${rate}% תיאום (${best[1].meetings} פגישות מ-${best[1].leads} לידים).`,metric:''});}
+
+    // Forms vs calls
+    const forms=calls.filter(isF),phCalls=calls.filter(isC);
+    const fMeet=forms.filter(isMeet).length,cMeet=phCalls.filter(isMeet).length;
+    const fRate=forms.length>0?Math.round((fMeet/forms.length)*100):0,cRate=phCalls.length>0?Math.round((cMeet/phCalls.length)*100):0;
+    if(forms.length>0&&phCalls.length>0){
+        const better=fRate>cRate?'טפסים':'שיחות טלפון';const bRate=Math.max(fRate,cRate);
+        insights.push({icon:'📊',bg:'var(--pink-bg)',color:'var(--pink)',title:'מה ממיר יותר?',text:`<b>${better}</b> ממירים טוב יותר עם ${bRate}% המרה (טפסים ${fRate}% | שיחות ${cRate}%).`,metric:''});
+    }
+
+    let h=`<div class="section"><div class="section-header"><div class="section-title">תובנות חכמות</div><span style="font-size:12px;color:var(--text-muted)">${insights.length} תובנות זוהו</span></div>`;
+    h+=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:12px">`;
+    insights.forEach(ins=>{
+        h+=`<div class="insight-card"><div class="insight-icon" style="background:${ins.bg};color:${ins.color};font-size:20px">${ins.icon}</div><div><div class="insight-title">${ins.title}</div><div class="insight-text">${ins.text}</div></div></div>`;
+    });
+    h+=`</div></div>`;
+
+    h+=`<div class="section"><div class="section-header"><div class="section-title">סיכום מנהלים</div></div><div class="chart-card" style="padding:24px;line-height:2;font-size:14px">`;
+    h+=`<p>בתקופה הנבחרת הגיעו <b>${t} לידים</b> (ממוצע ${Math.round(t/days*10)/10} ליום). `;
+    h+=`מתוכם, <b>${mt.length} תואמו לפגישה</b> (${convRate}%)`;
+    if(ar.length)h+=`, <b>${ar.length} הגיעו</b>`;
+    if(dl.length)h+=` ונסגרו <b>${dl.length} עסקאות</b> בסך ₪${rev.toLocaleString('he-IL')}`;
+    h+=`.</p>`;
+    if(chSorted.length>1)h+=`<p>הערוץ המוביל הוא <b>${esc(chSorted[0][0])}</b>, ורוב הפעילות מתרחשת ביום <b>${dayNames[bestDay]}</b> סביב השעה <b>${String(peakHr).padStart(2,'0')}:00</b>.</p>`;
+    h+=`</div></div>`;
+
+    _('content').innerHTML=h;
+}
+
+// ═══ LEAD TIMELINE ═══
+function showLeadTimeline(phone,name){
+    const existing=document.getElementById('tlDrawer');if(existing)existing.remove();
+    const existingBg=document.getElementById('tlBackdrop');if(existingBg)existingBg.remove();
+
+    const allByPhone=S.allCalls.filter(c=>{
+        const p=c.caller_number_bare||c.caller_number_format||'';
+        return p===phone;
+    }).sort((a,b)=>(pd(a.called_at)||0)-(pd(b.called_at)||0));
+
+    if(!allByPhone.length){toast('לא נמצאו אירועים עבור ליד זה','info');return;}
+
+    let html=`<button class="timeline-close" onclick="closeTimeline()">✕</button>`;
+    html+=`<div class="timeline-header"><div class="timeline-name">${esc(name||'ללא שם')}</div><div class="timeline-phone">${esc(phone)}</div>`;
+    html+=`<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">`;
+    html+=`<span class="badge badge-blue">${allByPhone.length} אירועים</span>`;
+    const hasM=allByPhone.some(isMeet);if(hasM)html+=`<span class="badge badge-green">יש פגישה</span>`;
+    const hasDeal=allByPhone.some(c=>da(c)>0);if(hasDeal)html+=`<span class="badge badge-purple">יש עסקה</span>`;
+    html+=`</div></div>`;
+
+    html+=`<div style="margin-top:8px">`;
+    allByPhone.forEach(c=>{
+        const d=pd(c.called_at);
+        const ds=d?d.toLocaleString('he-IL',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
+        const fm=isF(c);const ch=gCh(c);const cs=crm(c);const cm=CRMM[cs]||null;
+        const answered=isA(c);const missed=isM(c);
+        let dotColor='var(--blue)';
+        if(cs&&CRMM[cs])dotColor=CRMM[cs].c;
+        else if(missed)dotColor='var(--red)';
+        else if(answered)dotColor='var(--green)';
+        else if(fm)dotColor='var(--pink)';
+
+        html+=`<div class="tl-item"><div class="tl-dot" style="background:${dotColor}"></div>`;
+        html+=`<div class="tl-time">${ds}</div>`;
+        html+=`<div class="tl-desc">${fm?'<span class="badge badge-pink" style="margin-left:6px">טופס</span>':missed?'<span class="badge badge-red" style="margin-left:6px">לא נענתה</span>':answered?'<span class="badge badge-green" style="margin-left:6px">שיחה נענתה</span>':'<span class="badge badge-blue" style="margin-left:6px">שיחה</span>'} ${esc(ch.n)}</div>`;
+        const meta=[];
+        if(cs)meta.push(`סטטוס: <span class="badge ${cm?cm.b:'badge-gray'}">${esc(cs)}</span>`);
+        if(c.talk_time)meta.push(`משך: ${c.talk_time}s`);
+        if(da(c)>0)meta.push(`עסקה: ₪${da(c).toLocaleString('he-IL')}`);
+        if(nb(c))meta.push(esc(nb(c)));
+        if(meta.length)html+=`<div class="tl-meta">${meta.join(' · ')}</div>`;
+        html+=`</div>`;
+    });
+    html+=`</div>`;
+
+    const bg=document.createElement('div');bg.className='timeline-backdrop';bg.id='tlBackdrop';bg.onclick=closeTimeline;
+    const drawer=document.createElement('div');drawer.className='timeline-drawer';drawer.id='tlDrawer';drawer.innerHTML=html;
+    document.body.appendChild(bg);document.body.appendChild(drawer);
+}
+function closeTimeline(){
+    const d=document.getElementById('tlDrawer'),b=document.getElementById('tlBackdrop');
+    if(d)d.remove();if(b)b.remove();
 }
 
 // ═══ DATE ═══

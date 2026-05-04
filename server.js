@@ -13,6 +13,15 @@ const CTM_AUTH = 'Basic YTgzZDlmMzM3NWY1ZDIyNzEwYWUwMDY2YWNkMzU1YTNkYzdkOjM0ODVj
 const ACCOUNT_ID = '83';
 const SESSION_SECRET = 'tb-dashboard-2026-results-group-secret-key';
 const USERS_FILE = path.join(__dirname, 'users.json');
+const TARGETS_FILE = path.join(__dirname, 'targets.json');
+
+const DEFAULT_TARGETS = { meetRate: 50, arrRate: 30, dealRate: 40 };
+
+function loadTargets() {
+    try { return JSON.parse(fs.readFileSync(TARGETS_FILE, 'utf8')); }
+    catch { return { ...DEFAULT_TARGETS }; }
+}
+function saveTargets(t) { fs.writeFileSync(TARGETS_FILE, JSON.stringify(t, null, 2)); }
 
 function hashPw(pw) { return crypto.createHash('sha256').update(pw + SESSION_SECRET).digest('hex'); }
 
@@ -147,6 +156,24 @@ const server = http.createServer(async (req, res) => {
         users = users.filter(u => u.id !== body.id);
         saveUsers(users);
         return json(res, 200, { ok: true });
+    }
+
+    if (pathname === '/auth/targets' && req.method === 'GET') {
+        const sess = getSession(req);
+        if (!sess) return json(res, 401, { error: 'not authenticated' });
+        return json(res, 200, loadTargets());
+    }
+
+    if (pathname === '/auth/targets/update' && req.method === 'POST') {
+        const sess = getSession(req);
+        if (!sess || sess.role !== 'admin') return json(res, 403, { error: 'forbidden' });
+        const body = await readBody(req);
+        const targets = loadTargets();
+        if (body.meetRate !== undefined) targets.meetRate = Math.max(0, Math.min(100, Number(body.meetRate) || 0));
+        if (body.arrRate !== undefined) targets.arrRate = Math.max(0, Math.min(100, Number(body.arrRate) || 0));
+        if (body.dealRate !== undefined) targets.dealRate = Math.max(0, Math.min(100, Number(body.dealRate) || 0));
+        saveTargets(targets);
+        return json(res, 200, targets);
     }
 
     // ── Protected pages ──
