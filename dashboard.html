@@ -1802,36 +1802,45 @@ function calcLifecycle(calls){
         medToMeet:med(toMeet),medToArr:med(toArr),medToDeal:med(toDeal)};
 }
 
-function fmtDuration(hours){
-    if(hours<1)return Math.round(hours*60)+' דקות';
-    if(hours<24)return Math.round(hours*10)/10+' שעות';
-    const days=Math.round(hours/24*10)/10;
-    return days+' ימים';
+function fmtDays(hours){
+    const d=hours/24;
+    if(d<0.05)return '< 1';
+    return (Math.round(d*10)/10).toString();
 }
 
 function renderLifecycleView(calls){
     const lc=calcLifecycle(calls);
+
+    const sameDay=n=>n.filter(x=>x.hours<1).length;
+    const nonZero=n=>n.filter(x=>x.hours>=1);
+    const avgNZ=arr=>{const nz=nonZero(arr);return nz.length?nz.reduce((s,x)=>s+x.hours,0)/nz.length:0;};
+    const medNZ=arr=>{const nz=nonZero(arr).sort((a,b)=>a.hours-b.hours);if(!nz.length)return 0;const m=Math.floor(nz.length/2);return nz.length%2?nz[m].hours:(nz[m-1].hours+nz[m].hours)/2;};
 
     let h=`<div class="section"><div class="section-header"><div class="section-title">זמן ממוצע בין שלבים</div><span style="font-size:12px;color:var(--text-muted)">מבוסס על ${countUniquePhones(calls)} לידים ייחודיים</span></div>`;
 
     h+=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">`;
 
     const stages=[
-        {label:'ליד → פגישה',avg:lc.avgToMeet,med:lc.medToMeet,count:lc.toMeet.length,color:'var(--green)',icon:'📅'},
-        {label:'ליד → הגיע',avg:lc.avgToArr,med:lc.medToArr,count:lc.toArr.length,color:'var(--gold)',icon:'🏢'},
-        {label:'ליד → עסקה',avg:lc.avgToDeal,med:lc.medToDeal,count:lc.toDeal.length,color:'var(--purple)',icon:'💰'},
-        {label:'פגישה → הגיע',avg:lc.avgMeetToArr,med:0,count:lc.meetToArr.length,color:'var(--cyan)',icon:'🚶'},
-        {label:'הגיע → עסקה',avg:lc.avgArrToDeal,med:0,count:lc.arrToDeal.length,color:'var(--pink)',icon:'🤝'},
+        {label:'ליד → פגישה',arr:lc.toMeet,color:'var(--green)',icon:IC.calendar},
+        {label:'ליד → הגיע',arr:lc.toArr,color:'var(--gold)',icon:IC.building},
+        {label:'ליד → עסקה',arr:lc.toDeal,color:'var(--purple)',icon:IC.money},
+        {label:'פגישה → הגיע',arr:lc.meetToArr,color:'var(--cyan)',icon:IC.check},
+        {label:'הגיע → עסקה',arr:lc.arrToDeal,color:'var(--pink)',icon:IC.wallet},
     ];
 
     stages.forEach(s=>{
+        const nz=nonZero(s.arr),sd=sameDay(s.arr);
+        const avgD=nz.length?avgNZ(s.arr):0;
+        const medD=nz.length?medNZ(s.arr):0;
         h+=`<div class="chart-card" style="text-align:center;border-top:3px solid ${s.color}">`;
-        h+=`<div style="font-size:24px;margin-bottom:8px">${s.icon}</div>`;
+        h+=`<div style="margin-bottom:10px;color:${s.color};display:flex;justify-content:center">${s.icon}</div>`;
         h+=`<div style="font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:12px">${s.label}</div>`;
-        if(s.count>0){
-            h+=`<div class="kpi-val" style="font-size:28px;color:${s.color}">${fmtDuration(s.avg)}</div>`;
-            h+=`<div class="kpi-sub" style="margin-top:4px">ממוצע מתוך ${s.count} לידים</div>`;
-            if(s.med>0)h+=`<div class="kpi-sub">חציון: ${fmtDuration(s.med)}</div>`;
+        if(s.arr.length>0){
+            h+=`<div class="kpi-val" style="font-size:32px;color:${s.color}">${fmtDays(avgD)}</div>`;
+            h+=`<div style="font-size:12px;color:var(--text-muted);margin-top:2px">ימים (ממוצע)</div>`;
+            if(medD>0)h+=`<div class="kpi-sub" style="margin-top:6px">חציון: ${fmtDays(medD)} ימים</div>`;
+            if(sd>0)h+=`<div class="kpi-sub">${sd} לידים תואמו באותו יום</div>`;
+            h+=`<div class="kpi-sub">מתוך ${s.arr.length} לידים</div>`;
         } else {
             h+=`<div style="font-size:14px;color:var(--text-muted);padding:12px 0">אין נתונים</div>`;
         }
@@ -1843,19 +1852,21 @@ function renderLifecycleView(calls){
     h+=`<div class="section"><div class="section-header"><div class="section-title">תהליך מכירה ממוצע</div></div><div class="chart-card">`;
     h+=`<div style="display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;padding:20px 0">`;
 
+    const flowAvgs=[avgNZ(lc.toMeet),avgNZ(lc.meetToArr),avgNZ(lc.arrToDeal)];
     const flow=[
-        {label:'ליד נכנס',val:countUniquePhones(calls),color:'#3b82f6'},
-        {label:'פגישה',val:lc.toMeet.length,color:'#10b981',time:lc.avgToMeet},
-        {label:'הגיע',val:lc.toArr.length,color:'#eab308',time:lc.avgMeetToArr},
-        {label:'עסקה',val:lc.toDeal.length,color:'#8b5cf6',time:lc.avgArrToDeal},
+        {label:'ליד נכנס',val:countUniquePhones(calls),color:'#3b82f6',icon:IC.leads},
+        {label:'פגישה',val:lc.toMeet.length,color:'#10b981',time:flowAvgs[0],icon:IC.calendar},
+        {label:'הגיע',val:lc.toArr.length,color:'#eab308',time:flowAvgs[1],icon:IC.building},
+        {label:'עסקה',val:lc.toDeal.length,color:'#8b5cf6',time:flowAvgs[2],icon:IC.money},
     ];
 
     flow.forEach((step,i)=>{
-        h+=`<div style="text-align:center;min-width:90px"><div style="width:60px;height:60px;border-radius:50%;background:${step.color}15;border:3px solid ${step.color};margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:${step.color}">${step.val}</div><div style="font-size:12px;font-weight:600">${step.label}</div></div>`;
+        h+=`<div style="text-align:center;min-width:100px"><div style="width:64px;height:64px;border-radius:50%;background:${step.color}15;border:3px solid ${step.color};margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:${step.color}">${step.val}</div><div style="font-size:12px;font-weight:600">${step.label}</div></div>`;
         if(i<flow.length-1){
             const t=flow[i+1].time;
-            h+=`<div style="display:flex;flex-direction:column;align-items:center;padding:0 8px;margin-bottom:20px"><div style="width:50px;height:2px;background:var(--border);position:relative"><div style="position:absolute;left:-4px;top:-3px;border:4px solid transparent;border-right-color:var(--border)"></div></div>`;
-            if(t>0)h+=`<div style="font-size:11px;color:var(--text-muted);margin-top:4px;white-space:nowrap">${fmtDuration(t)}</div>`;
+            h+=`<div style="display:flex;flex-direction:column;align-items:center;padding:0 10px;margin-bottom:20px"><div style="width:60px;height:2px;background:var(--border);position:relative"><div style="position:absolute;left:-4px;top:-3px;border:4px solid transparent;border-right-color:var(--border)"></div></div>`;
+            if(t>0)h+=`<div style="font-size:11px;font-weight:600;color:var(--accent);margin-top:4px;white-space:nowrap">${fmtDays(t)} ימים</div>`;
+            else h+=`<div style="font-size:11px;color:var(--text-muted);margin-top:4px;white-space:nowrap">באותו יום</div>`;
             h+=`</div>`;
         }
     });
@@ -1863,20 +1874,21 @@ function renderLifecycleView(calls){
 
     // Distribution chart
     if(lc.toMeet.length>2){
-        h+=`<div class="section"><div class="section-header"><div class="section-title">התפלגות זמן עד פגישה</div></div><div class="chart-card"><div class="chart-container" style="height:280px"><canvas id="lcDistC"></canvas></div></div></div>`;
+        h+=`<div class="section"><div class="section-header"><div class="section-title">התפלגות זמן עד תיאום פגישה</div></div><div class="chart-card"><div class="chart-container" style="height:280px"><canvas id="lcDistC"></canvas></div></div></div>`;
     }
 
-    // Fastest & slowest
-    if(lc.toMeet.length>0){
-        const fast=[...lc.toMeet].sort((a,b)=>a.hours-b.hours).slice(0,5);
-        const slow=[...lc.toMeet].sort((a,b)=>b.hours-a.hours).slice(0,5);
+    // Fastest & slowest (only non-zero)
+    const nonZeroMeet=nonZero(lc.toMeet);
+    if(nonZeroMeet.length>0){
+        const fast=[...nonZeroMeet].sort((a,b)=>a.hours-b.hours).slice(0,5);
+        const slow=[...nonZeroMeet].sort((a,b)=>b.hours-a.hours).slice(0,5);
 
         h+=`<div class="section"><div class="charts-row"><div class="list-card"><div class="chart-head"><span class="chart-title">הכי מהיר לפגישה</span></div>`;
-        fast.forEach(l=>{h+=`<div class="list-item"><div class="list-dot" style="background:var(--green)"></div><span class="list-name">${esc(l.name||'ללא שם')}</span><span class="list-count" style="color:var(--green)">${fmtDuration(l.hours)}</span></div>`;});
+        fast.forEach(l=>{h+=`<div class="list-item"><div class="list-dot" style="background:var(--green)"></div><span class="list-name">${esc(l.name||'ללא שם')}</span><span class="list-count" style="color:var(--green)">${fmtDays(l.hours)} ימים</span></div>`;});
         h+=`</div>`;
 
         h+=`<div class="list-card"><div class="chart-head"><span class="chart-title">הכי איטי לפגישה</span></div>`;
-        slow.forEach(l=>{h+=`<div class="list-item"><div class="list-dot" style="background:var(--red)"></div><span class="list-name">${esc(l.name||'ללא שם')}</span><span class="list-count" style="color:var(--red)">${fmtDuration(l.hours)}</span></div>`;});
+        slow.forEach(l=>{h+=`<div class="list-item"><div class="list-dot" style="background:var(--red)"></div><span class="list-name">${esc(l.name||'ללא שם')}</span><span class="list-count" style="color:var(--red)">${fmtDays(l.hours)} ימים</span></div>`;});
         h+=`</div></div></div>`;
     }
 
