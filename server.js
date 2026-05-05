@@ -77,10 +77,10 @@ function saveUsers(users) { fs.writeFileSync(USERS_FILE, JSON.stringify(users, n
 function initUsers() {
     if (!fs.existsSync(USERS_FILE)) {
         saveUsers([
-            { id: '1', username: 'admin', password: hashPw('admin123'), name: 'מנהל מערכת', role: 'admin', branch: '' },
-            { id: '2', username: 'helga', password: hashPw('helga2026'), name: 'הלגה רקנטי', role: 'client', branch: '' },
+            { id: '1', username: 'tzachi', password: hashPw('tzachi2026'), name: 'צחי', role: 'owner', branch: '' },
+            { id: '2', username: 'helga', password: hashPw('helga2026'), name: 'הלגה רקנטי', role: 'owner', branch: '' },
         ]);
-        console.log('[AUTH] Created default users (admin/admin123, helga/helga2026)');
+        console.log('[AUTH] Created default users (tzachi/tzachi2026, helga/helga2026)');
     }
 }
 
@@ -158,19 +158,19 @@ const server = http.createServer(async (req, res) => {
 
     if (pathname === '/auth/users' && req.method === 'GET') {
         const sess = getSession(req);
-        if (!sess || sess.role !== 'admin') return json(res, 403, { error: 'forbidden' });
+        if (!sess || sess.role !== 'owner') return json(res, 403, { error: 'forbidden' });
         const users = loadUsers().map(u => ({ id: u.id, username: u.username, name: u.name, role: u.role, branch: u.branch }));
         return json(res, 200, users);
     }
 
     if (pathname === '/auth/users/create' && req.method === 'POST') {
         const sess = getSession(req);
-        if (!sess || sess.role !== 'admin') return json(res, 403, { error: 'forbidden' });
+        if (!sess || sess.role !== 'owner') return json(res, 403, { error: 'forbidden' });
         const body = await readBody(req);
         if (!body.username || !body.password) return json(res, 400, { error: 'missing fields' });
         const users = loadUsers();
         if (users.find(u => u.username === body.username)) return json(res, 400, { error: 'שם משתמש כבר קיים' });
-        const newUser = { id: crypto.randomBytes(8).toString('hex'), username: body.username, password: hashPw(body.password), name: body.name || body.username, role: body.role || 'client', branch: body.branch || '' };
+        const newUser = { id: crypto.randomBytes(8).toString('hex'), username: body.username, password: hashPw(body.password), name: body.name || body.username, role: body.role || 'admin', branch: body.branch || '' };
         users.push(newUser);
         saveUsers(users);
         return json(res, 200, { id: newUser.id, username: newUser.username, name: newUser.name, role: newUser.role, branch: newUser.branch });
@@ -178,7 +178,7 @@ const server = http.createServer(async (req, res) => {
 
     if (pathname === '/auth/users/update' && req.method === 'POST') {
         const sess = getSession(req);
-        if (!sess || sess.role !== 'admin') return json(res, 403, { error: 'forbidden' });
+        if (!sess || sess.role !== 'owner') return json(res, 403, { error: 'forbidden' });
         const body = await readBody(req);
         const users = loadUsers();
         const user = users.find(u => u.id === body.id);
@@ -193,7 +193,7 @@ const server = http.createServer(async (req, res) => {
 
     if (pathname === '/auth/users/delete' && req.method === 'POST') {
         const sess = getSession(req);
-        if (!sess || sess.role !== 'admin') return json(res, 403, { error: 'forbidden' });
+        if (!sess || sess.role !== 'owner') return json(res, 403, { error: 'forbidden' });
         const body = await readBody(req);
         let users = loadUsers();
         users = users.filter(u => u.id !== body.id);
@@ -209,7 +209,7 @@ const server = http.createServer(async (req, res) => {
 
     if (pathname === '/auth/targets/update' && req.method === 'POST') {
         const sess = getSession(req);
-        if (!sess || sess.role !== 'admin') return json(res, 403, { error: 'forbidden' });
+        if (!sess || sess.role !== 'owner') return json(res, 403, { error: 'forbidden' });
         const body = await readBody(req);
         const targets = loadTargets();
         if (body.meetRate !== undefined) targets.meetRate = Math.max(0, Math.min(100, Number(body.meetRate) || 0));

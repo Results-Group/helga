@@ -59,8 +59,8 @@
         .role-badge {
             display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;
         }
+        .role-owner { background: #fce7f3; color: #be185d; }
         .role-admin { background: #fef3c7; color: #b45309; }
-        .role-client { background: #dbeafe; color: #1d4ed8; }
         .role-branch { background: #d1fae5; color: #047857; }
 
         .act-btn {
@@ -163,9 +163,9 @@
         מידע על ההרשאות
     </div>
     <div class="card" style="font-size:13px;line-height:2.2">
-        <div><span class="role-badge role-admin">אדמין</span> — גישה מלאה: דאשבורד + ניהול משתמשים</div>
-        <div><span class="role-badge role-client">לקוח</span> — גישה לדאשבורד בלבד, כל הסניפים</div>
-        <div><span class="role-badge role-branch">מנהל סניף</span> — גישה לדאשבורד, רק נתוני הסניף שהוגדר</div>
+        <div><span class="role-badge role-owner">בעלים</span> — גישה מלאה: דאשבורד + ניהול משתמשים + שינוי הגדרות</div>
+        <div><span class="role-badge role-admin">אדמין</span> — גישה מלאה לכל הנתונים בכל הסניפים, ללא שינוי הגדרות</div>
+        <div><span class="role-badge role-branch">מנהל סניף</span> — ראייה מלאה של נתוני הסניף שהוגדר בלבד</div>
     </div>
 </div>
 
@@ -189,8 +189,8 @@
         <div class="field">
             <label>תפקיד</label>
             <select id="mRole" onchange="toggleBranch()">
+                <option value="owner">בעלים</option>
                 <option value="admin">אדמין</option>
-                <option value="client">לקוח</option>
                 <option value="branch">מנהל סניף</option>
             </select>
         </div>
@@ -212,14 +212,14 @@
 </div>
 
 <script>
-const ROLES = { admin: 'אדמין', client: 'לקוח', branch: 'מנהל סניף' };
-const ROLE_CLASS = { admin: 'role-admin', client: 'role-client', branch: 'role-branch' };
+const ROLES = { owner: 'בעלים', admin: 'אדמין', branch: 'מנהל סניף' };
+const ROLE_CLASS = { owner: 'role-owner', admin: 'role-admin', branch: 'role-branch' };
 
 async function checkAuth() {
     try {
         const r = await fetch('/auth/me');
         const d = await r.json();
-        if (d.role !== 'admin') { window.location.href = d.role ? '/dashboard.html' : '/login.html'; return; }
+        if (d.role !== 'owner') { window.location.href = d.role ? '/dashboard.html' : '/login.html'; return; }
     } catch { window.location.href = '/login.html'; }
 }
 

@@ -111,7 +111,7 @@ async function doLogin(e) {
             btn.textContent = 'התחבר';
             return;
         }
-        if (data.role === 'admin') {
+        if (data.role === 'owner') {
             window.location.href = '/admin.html';
         } else {
             window.location.href = '/dashboard.html';
@@ -125,7 +125,7 @@ async function doLogin(e) {
 }
 
 fetch('/auth/me').then(r => r.json()).then(data => {
-    if (data.role) window.location.href = data.role === 'admin' ? '/admin.html' : '/dashboard.html';
+    if (data.role) window.location.href = data.role === 'owner' ? '/admin.html' : '/dashboard.html';
 }).catch(() => {});
 </script>
 </body>

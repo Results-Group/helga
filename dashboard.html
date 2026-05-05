@@ -754,7 +754,7 @@ async function checkAuth(){
         USER_ROLE=d.role;USER_BRANCH=d.branch||'';
         const ub=document.getElementById('userBadge');
         if(ub)ub.textContent=d.name||'';
-        if(d.role==='admin'){const al=document.getElementById('adminLink');if(al)al.style.display='flex';}
+        if(d.role==='owner'){const al=document.getElementById('adminLink');if(al)al.style.display='flex';}
         if(d.role==='branch'&&d.branch){
             S.branchFilter=d.branch;
             const bs=document.getElementById('branchSelect');if(bs)bs.style.display='none';
@@ -1002,7 +1002,7 @@ function renderOverview(calls){
         h+=`</div>`;
     }
 
-    const tgtBtn=USER_ROLE==='admin'?`<button class="targets-edit-btn" onclick="openTargetsModal()">✎ ערוך יעדים</button>`:'';
+    const tgtBtn=USER_ROLE==='owner'?`<button class="targets-edit-btn" onclick="openTargetsModal()">✎ ערוך יעדים</button>`:'';
     h+=`<div class="section"><div class="section-header"><div class="section-title">מדדי ביצוע מרכזיים</div>${tgtBtn}</div><div class="kpi-grid">`;
     const kpis=[
         {icon:IC.leads,bg:'var(--blue-bg)',color:'var(--blue)',val:t,pv:pt,label:'סה"כ פניות',sub:`${uniq} ייחודיים · ממוצע ${dailyAvg} ליום`,click:'all'},

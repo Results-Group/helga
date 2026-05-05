@@ -1,18 +1,66 @@
 [
   {
     "id": "1",
-    "username": "admin",
-    "password": "6355d12c586a7cfc51a095fe1c462015dcb65dd9587e239c6eacc365accd68f7",
-    "name": "מנהל מערכת",
-    "role": "admin",
+    "username": "tzachi",
+    "password": "af5dfd495feebc83e8ca3d373dc3bda5c27bce7ccdd7b2ea09d6cbde0d6f7dea",
+    "name": "צחי",
+    "role": "owner",
     "branch": ""
   },
   {
     "id": "2",
     "username": "helga",
-    "password": "2dbf7d659d2ce33ae85cddc98a15fbee21618e7c5c0b10164c53195d3c1ab7f2",
+    "password": "0bab8050ed87791c124e0b25902604aedc14d008c9328ff6ecc57be8ecd4afd5",
     "name": "הלגה רקנטי",
-    "role": "client",
+    "role": "owner",
+    "branch": ""
+  },
+  {
+    "id": "3",
+    "username": "asaf",
+    "password": "c2e7fb558e1888da929580ad8d5b3731f03aba377b7d381a8d9a5872e6379099",
+    "name": "אסף - מנהל שיווק",
+    "role": "admin",
+    "branch": ""
+  },
+  {
+    "id": "4",
+    "username": "uri",
+    "password": "2d78e0ac8bf99cdba8e0a23322aa07ee98f71659710a5fa48658384725792ced",
+    "name": "אורי מלר - מנהל רשת",
+    "role": "admin",
+    "branch": ""
+  },
+  {
+    "id": "5",
+    "username": "jerusalem",
+    "password": "ae9204954b69c4aa089b8ab53abe25bf7131c73e2716d70d875d43eafcb4f8d7",
+    "name": "מנהל סניף ירושלים",
+    "role": "branch",
+    "branch": "סניף ירושלים"
+  },
+  {
+    "id": "6",
+    "username": "netanya",
+    "password": "b7e930b5c9666cda906d1167dd00c75928248b312d45a3e85cf7ffb1c2f516f5",
+    "name": "מנהל סניף נתניה",
+    "role": "branch",
+    "branch": "סניף נתניה"
+  },
+  {
+    "id": "7",
+    "username": "ashdod",
+    "password": "57df37e8af7e1513c53f92fc371d0333e98e67ea381886270cebea45a5a73051",
+    "name": "מנהל סניף אשדוד",
+    "role": "branch",
+    "branch": "סניף אשדוד"
+  },
+  {
+    "id": "8",
+    "username": "results",
+    "password": "ebe0aa6f330df0d5655de1127515e4ce8cac6d161950ad85d4a89bc6a7cc32a4",
+    "name": "Results - מתכנת",
+    "role": "owner",
     "branch": ""
   }
 ]
