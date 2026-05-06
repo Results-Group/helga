@@ -57,6 +57,19 @@ const ACCOUNT_ID = '83';
 const SESSION_SECRET = 'tb-dashboard-2026-results-group-secret-key';
 const USERS_FILE = path.join(__dirname, 'users.json');
 const TARGETS_FILE = path.join(__dirname, 'targets.json');
+const LOGIN_LOG_FILE = path.join(__dirname, 'login_log.json');
+
+function loadLoginLog() {
+    try { return JSON.parse(fs.readFileSync(LOGIN_LOG_FILE, 'utf8')); }
+    catch { return []; }
+}
+function saveLoginLog(log) { fs.writeFileSync(LOGIN_LOG_FILE, JSON.stringify(log, null, 2)); }
+function recordLogin(user, ip) {
+    const log = loadLoginLog();
+    log.unshift({ userId: user.id, username: user.username, name: user.name, role: user.role, time: Date.now(), ip: ip || '' });
+    if (log.length > 500) log.length = 500;
+    saveLoginLog(log);
+}
 
 const DEFAULT_TARGETS = { meetRate: 50, arrRate: 30, dealRate: 40 };
 
@@ -120,7 +133,7 @@ function json(res, status, data) {
 }
 
 const PUBLIC = ['/login.html', '/favicon.ico'];
-const AUTH_ROUTES = ['/auth/login', '/auth/logout', '/auth/me', '/auth/users', '/auth/users/create', '/auth/users/update', '/auth/users/delete', '/auth/targets', '/auth/targets/update'];
+const AUTH_ROUTES = ['/auth/login', '/auth/logout', '/auth/me', '/auth/users', '/auth/users/create', '/auth/users/update', '/auth/users/delete', '/auth/targets', '/auth/targets/update', '/auth/login-log'];
 
 initUsers();
 
@@ -141,6 +154,8 @@ const server = http.createServer(async (req, res) => {
         const user = users.find(u => u.username === body.username && u.password === hashPw(body.password));
         if (!user) return json(res, 401, { error: 'שם משתמש או סיסמה שגויים' });
         const sid = createSession(user);
+        const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || '';
+        recordLogin(user, clientIp);
         res.setHeader('Set-Cookie', `sid=${sid}; Path=/; HttpOnly; SameSite=Strict; Max-Age=86400`);
         return json(res, 200, { name: user.name, role: user.role, branch: user.branch });
     }
@@ -217,6 +232,12 @@ const server = http.createServer(async (req, res) => {
         if (body.dealRate !== undefined) targets.dealRate = Math.max(0, Math.min(100, Number(body.dealRate) || 0));
         saveTargets(targets);
         return json(res, 200, targets);
+    }
+
+    if (pathname === '/auth/login-log' && req.method === 'GET') {
+        const sess = getSession(req);
+        if (!sess || sess.role !== 'owner') return json(res, 403, { error: 'forbidden' });
+        return json(res, 200, loadLoginLog());
     }
 
     // ── Protected pages ──
@@ -310,7 +331,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     // ── Static Files ──
-    if (pathname === '/.cache.json' || pathname === '/users.json' || pathname === '/targets.json') {
+    if (pathname === '/.cache.json' || pathname === '/users.json' || pathname === '/targets.json' || pathname === '/login_log.json') {
         res.writeHead(404); res.end('Not Found'); return;
     }
     let filePath = pathname === '/' ? '/dashboard.html' : pathname;
