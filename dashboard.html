@@ -654,6 +654,10 @@ const CH = {
     'google my business':{n:'Google My Business',c:'#34a853'},
     'ad extension':{n:'תוסף שיחות Google',c:'#fbbc04'},
     'direct or unknown':{n:'אורגני / ישיר',c:'#8b5cf6'},
+    'organic or direct':{n:'אורגני / ישיר',c:'#8b5cf6'},
+    'organic':{n:'אורגני / ישיר',c:'#8b5cf6'},
+    'direct':{n:'אורגני / ישיר',c:'#8b5cf6'},
+    'website':{n:'אורגני / ישיר',c:'#8b5cf6'},
 };
 const BC = ['#4f6ef7','#10b981','#f59e0b','#ec4899','#06b6d4','#8b5cf6'];
 let TARGETS = { meetRate:50, arrRate:30, dealRate:40 };
@@ -672,7 +676,7 @@ const IC = {
     campaign:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>',
 };
 const CRMM = {
-    'נקבעה פגישה':{c:'#10b981',b:'badge-green',o:1},'הגיע לפגישה':{c:'#eab308',b:'badge-gold',o:2},
+    'חדש':{c:'#6366f1',b:'badge-blue',o:0},'נקבעה פגישה':{c:'#10b981',b:'badge-green',o:1},'הגיע לפגישה':{c:'#eab308',b:'badge-gold',o:2},
     'אין מענה':{c:'#f59e0b',b:'badge-orange',o:3},'לחזור לליד':{c:'#3b82f6',b:'badge-blue',o:4},
     'במועד מרוחק':{c:'#8b5cf6',b:'badge-purple',o:5},'ליד לא תקין':{c:'#ef4444',b:'badge-red',o:6},
     'הגיע וקיבל הצעה':{c:'#06b6d4',b:'badge-blue',o:2.5},'נסגרה עסקה':{c:'#059669',b:'badge-green',o:0.5},
@@ -681,18 +685,21 @@ const CRMM = {
 
 function nb(c){const cf=c.custom_fields||{};let b=(cf.branch||'').trim();if(!b)b=(c.business_label||'').trim();if(!b)return 'סניף ראשל״צ';const l=b.toLowerCase();if(l.includes('rishon')||b.includes('ראשל')||b.includes('רשל'))return 'סניף ראשל״צ';if(l.includes('ashdod')||b.includes('אשדוד'))return 'סניף אשדוד';if(l.includes('netanya')||b.includes('נתניה'))return 'סניף נתניה';if(l.includes('jerusalem')||b.includes('ירושלים'))return 'סניף ירושלים';return 'סניף ראשל״צ';}
 function crm(c){
-    let s=((c.custom_fields||{}).crm_status||'').replace(/\uFFFD/g,'');
+    let s=((c.custom_fields||{}).crm_status||'').replace(/\uFFFD/g,'').replace(/[\u200B-\u200D\uFEFF]/g,'').trim();
     if(!s)return '';
-    if(s.includes('אין מ')&&s.includes('נה'))return 'אין מענה';
-    if(s.includes('לי')&&s.includes('לא תקין'))return 'ליד לא תקין';
-    if(s.includes('נקבעה'))return 'נקבעה פגישה';
-    if(s.includes('הגיע לפגישה'))return 'הגיע לפגישה';
-    if(s.includes('הגיע וקיבל'))return 'הגיע וקיבל הצעה';
-    if(s.includes('לחזור'))return 'לחזור לליד';
-    if(s.includes('במועד'))return 'במועד מרוחק';
-    if(s.includes('בוטלה'))return 'פגישה בוטלה';
-    if(s.includes('אי הופעה'))return 'אי הופעה';
-    if(s.includes('נסגרה'))return 'נסגרה עסקה';
+    const sl=s.toLowerCase();
+    if(s.includes('אין מ')&&(s.includes('נה')||s.includes('ענה')))return 'אין מענה';
+    if(sl.includes('no answer')||sl.includes('no-answer')||sl.includes('noanswer'))return 'אין מענה';
+    if(s.includes('לא תקין')||sl.includes('invalid')||sl.includes('not valid'))return 'ליד לא תקין';
+    if(s.includes('נקבעה')||sl.includes('meeting set')||sl.includes('scheduled'))return 'נקבעה פגישה';
+    if(s.includes('הגיע לפגישה')||sl.includes('arrived')||sl.includes('showed up'))return 'הגיע לפגישה';
+    if(s.includes('הגיע וקיבל')||sl.includes('got offer')||sl.includes('proposal'))return 'הגיע וקיבל הצעה';
+    if(s.includes('לחזור')||sl.includes('call back')||sl.includes('callback'))return 'לחזור לליד';
+    if(s.includes('במועד')||sl.includes('future')||sl.includes('later'))return 'במועד מרוחק';
+    if(s.includes('בוטלה')||sl.includes('cancel'))return 'פגישה בוטלה';
+    if(s.includes('אי הופעה')||sl.includes('no show')||sl.includes('no-show'))return 'אי הופעה';
+    if(s.includes('נסגרה')||sl.includes('closed')||sl.includes('deal'))return 'נסגרה עסקה';
+    if(s.includes('חדש')||sl.includes('new')||sl.includes('open'))return 'חדש';
     return s;
 }
 function da(c){return parseFloat((c.custom_fields||{}).deal_amount||'0')||0;}
@@ -705,9 +712,19 @@ function isF(c){return c.direction==='form';}
 function isC(c){return c.direction==='inbound'||c.direction==='outbound';}
 function isA(c){return!isF(c)&&(c.dial_status==='completed'||(c.talk_time&&c.talk_time>0));}
 function isM(c){return!isF(c)&&(c.dial_status==='no-answer'||c.dial_status==='missed');}
-function gCh(c){const t=(c.tag_list||[]).map(x=>x.toLowerCase());for(const[k,v]of Object.entries(CH)){if(t.some(x=>x.includes(k)))return v;}const s=(c.source||'').toLowerCase();for(const[k,v]of Object.entries(CH)){if(s.includes(k))return v;}return{n:c.source||c.tracking_label||'לא ידוע',c:'#9ca3af'};}
+function gCh(c){const t=(c.tag_list||[]).map(x=>x.toLowerCase());for(const[k,v]of Object.entries(CH)){if(t.some(x=>x.includes(k)))return v;}const s=(c.source||'').toLowerCase();for(const[k,v]of Object.entries(CH)){if(s.includes(k))return v;}const tl=(c.tracking_label||'').toLowerCase();for(const[k,v]of Object.entries(CH)){if(tl.includes(k))return v;}return{n:c.source||c.tracking_label||'לא ידוע',c:'#9ca3af'};}
 function pd(s){if(!s)return null;try{return new Date(s);}catch{return null;}}
-function fc(){let list=S.allCalls;if(S.branchFilter)list=list.filter(c=>nb(c)===S.branchFilter);if(S.channelFilter)list=list.filter(c=>gCh(c).n===S.channelFilter);return list;}
+function isInvalid(c){return crm(c)==='ליד לא תקין';}
+function isDuplicate(c,seen){const p=getPhone(c);if(!p||p.length<6)return false;if(seen.has(p))return true;seen.add(p);return false;}
+function fc(){
+    let list=S.allCalls;
+    if(S.branchFilter)list=list.filter(c=>nb(c)===S.branchFilter);
+    if(S.channelFilter)list=list.filter(c=>gCh(c).n===S.channelFilter);
+    list=list.filter(c=>!isInvalid(c));
+    const seen=new Set();
+    list=list.filter(c=>!isDuplicate(c,seen));
+    return list;
+}
 
 function getCN(c){const f=c.form||{};const cf=c.custom_fields||{};return f.campaign_name||cf.campaign_name||c.campaign_name||c.tracking_label||'';}
 function getPL(c){const f=c.form||{};const cf=c.custom_fields||{};return f.platform||cf.platform||c.platform||'';}
@@ -973,7 +990,8 @@ function generateAlerts(calls,pv){
 }
 
 function renderOverview(calls){
-    const pv=S.prevCalls.filter(c=>{if(S.branchFilter&&nb(c)!==S.branchFilter)return false;if(S.channelFilter&&gCh(c).n!==S.channelFilter)return false;return true;});
+    const pvSeen=new Set();
+    const pv=S.prevCalls.filter(c=>{if(S.branchFilter&&nb(c)!==S.branchFilter)return false;if(S.channelFilter&&gCh(c).n!==S.channelFilter)return false;if(isInvalid(c))return false;if(isDuplicate(c,pvSeen))return false;return true;});
     const t=calls.length,ph=calls.filter(isC),fm=calls.filter(isF),an=calls.filter(isA),mi=calls.filter(isM);
     const nw=calls.filter(c=>c.is_new_caller),mt=calls.filter(isMeet);
     const ar=calls.filter(isArr),dlRaw=calls.filter(c=>da(c)>0);
@@ -1424,9 +1442,9 @@ function buildFunnel(calls){
 }
 
 function buildCrmList(calls){
-    const counts={};calls.forEach(c=>{const s=crm(c);if(s)counts[s]=(counts[s]||0)+1;});
+    const counts={};calls.forEach(c=>{const s=crm(c)||'חדש';counts[s]=(counts[s]||0)+1;});
     const total=Object.values(counts).reduce((a,b)=>a+b,0)||1;
-    const sorted=Object.entries(counts).sort((a,b)=>(CRMM[a[0]]?.o||99)-(CRMM[b[0]]?.o||99));
+    const sorted=Object.entries(counts).sort((a,b)=>(CRMM[a[0]]?.o??99)-(CRMM[b[0]]?.o??99));
     const el=_('crmListEl');if(!el)return;
     el.innerHTML=sorted.map(([n,c])=>{const m=CRMM[n]||{c:'#9ca3af',b:'badge-gray'};return`<div class="list-item"><div class="list-dot" style="background:${m.c}"></div><span class="list-name">${esc(n)}</span><span class="list-count">${c}</span><span class="list-pct">${Math.round((c/total)*100)}%</span><div class="list-bar"><div class="list-bar-fill" style="width:${(c/total)*100}%;background:${m.c}"></div></div></div>`;}).join('');
 }
@@ -1567,7 +1585,7 @@ function buildCrmBranchMatrix(calls,branchNames){
     const statuses=Object.keys(CRMM);
     const matrix={};
     branchNames.forEach(b=>{matrix[b]={};statuses.forEach(s=>matrix[b][s]=0);});
-    calls.forEach(c=>{const b=nb(c),s=crm(c);if(!b||!s||!matrix[b])return;if(matrix[b][s]!==undefined)matrix[b][s]++;});
+    calls.forEach(c=>{const b=nb(c),s=crm(c)||'חדש';if(!b||!matrix[b])return;if(matrix[b][s]!==undefined)matrix[b][s]++;});
     const ctx=document.getElementById('crmBranchC');if(!ctx)return;
     S.charts.crmBranch=new Chart(ctx,{type:'bar',data:{
         labels:branchNames,
