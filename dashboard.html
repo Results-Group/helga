@@ -1330,13 +1330,18 @@ function renderCampaignsView(calls){
             h+=`<div style="text-align:center;min-width:52px"><div style="font-size:22px;font-weight:800;color:var(--green)">${d.meetings}</div><div style="font-size:10px;color:var(--text-muted)">פגישות</div></div>`;
             h+=`<div style="text-align:center;min-width:52px"><div style="font-size:22px;font-weight:800;color:var(--gold)">${d.arrived}</div><div style="font-size:10px;color:var(--text-muted)">הגיעו</div></div>`;
             h+=`<div style="text-align:center;min-width:52px"><div style="font-size:22px;font-weight:800;color:var(--purple)">${d.deals}</div><div style="font-size:10px;color:var(--text-muted)">עסקאות</div></div>`;
-            const dealPct=d.leads>0?Math.round((d.deals/d.leads)*100):0;
-            h+=`<div style="text-align:center;min-width:52px"><div style="font-size:18px;font-weight:800"><span class="badge ${cv>=15?'badge-green':cv>=8?'badge-orange':'badge-red'}" style="font-size:13px;padding:4px 10px">${cv}%</span></div><div style="font-size:10px;color:var(--text-muted);margin-top:4px">המרה לפגישה</div></div>`;
-            h+=`<div style="text-align:center;min-width:52px"><div style="font-size:18px;font-weight:800"><span class="badge ${dealPct>=10?'badge-green':dealPct>=5?'badge-orange':'badge-red'}" style="font-size:13px;padding:4px 10px">${dealPct}%</span></div><div style="font-size:10px;color:var(--text-muted);margin-top:4px">המרה לעסקה</div></div>`;
             if(d.rev>0){h+=`<div style="text-align:center;min-width:60px"><div style="font-size:18px;font-weight:800;color:var(--purple)">₪${d.rev.toLocaleString('he-IL')}</div><div style="font-size:10px;color:var(--text-muted)">הכנסות</div></div>`;}
             h+=`</div>`;
 
-            h+=`</div></div>`;
+            h+=`</div>`;
+            const dealPct=d.leads>0?Math.round((d.deals/d.leads)*100):0;
+            h+=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px;padding-top:12px;border-top:1px solid var(--bg)">`;
+            h+=`<div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:11px;color:var(--text-muted)">תיאום פגישה</span><span style="font-size:12px;font-weight:700;color:${cv>=TARGETS.meetRate?'var(--green)':'var(--red)'}">${cv}%</span></div>${targetGauge(cv,TARGETS.meetRate,'תיאום')}</div>`;
+            h+=`<div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:11px;color:var(--text-muted)">הגעה לפגישה</span><span style="font-size:12px;font-weight:700;color:${arrP>=TARGETS.arrRate?'var(--green)':'var(--red)'}">${arrP}%</span></div>${targetGauge(arrP,TARGETS.arrRate,'הגעה')}</div>`;
+            h+=`<div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:11px;color:var(--text-muted)">סגירת עסקה</span><span style="font-size:12px;font-weight:700;color:${dealPct>=TARGETS.dealRate?'var(--green)':'var(--red)'}">${dealPct}%</span></div>${targetGauge(dealPct,TARGETS.dealRate,'עסקה')}</div>`;
+            h+=`</div>`;
+
+            h+=`</div>`;
         });
     }
     h+=`</div>`;
