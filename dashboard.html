@@ -1218,8 +1218,9 @@ function renderBranchesView(calls){
         const fw=d.leads>0?(d.forms/d.leads)*100:0;
         const mw=100-aw-fw;
         const meetHit=mp>=TARGETS.meetRate,arrHit=ap>=TARGETS.arrRate;
+        const dlp=d.arrived>0?Math.round((d.deals/d.arrived)*100):0;
         h+=`<div class="branch-card"><div class="branch-head"><div class="branch-name"><div class="branch-dot" style="background:${clr}"></div>${esc(name)}</div><div class="branch-lead-count">${d.leads} לידים</div></div>
-        <div class="branch-metrics"><div><div class="bm-val" style="color:${meetHit?'var(--green)':'var(--red)'}">${d.meetings}</div><div class="bm-label">פגישות (${mp}%)</div><div style="font-size:9px;color:${meetHit?'var(--green)':'var(--red)'}">${meetHit?'✓':'✗'} יעד ${TARGETS.meetRate}%</div></div><div><div class="bm-val" style="color:${arrHit?'var(--green)':'var(--red)'}">${d.arrived}</div><div class="bm-label">הגיעו (${ap}%)</div><div style="font-size:9px;color:${arrHit?'var(--green)':'var(--red)'}">${arrHit?'✓':'✗'} יעד ${TARGETS.arrRate}%</div></div><div><div class="bm-val" style="color:var(--purple)">₪${d.rev.toLocaleString('he-IL')}</div><div class="bm-label">הכנסות</div></div></div>
+        <div class="branch-metrics"><div><div class="bm-val" style="color:${meetHit?'var(--green)':'var(--red)'}">${d.meetings}</div><div class="bm-label">פגישות (${mp}%)</div><div style="font-size:9px;color:${meetHit?'var(--green)':'var(--red)'}">${meetHit?'✓':'✗'} יעד ${TARGETS.meetRate}%</div></div><div><div class="bm-val" style="color:${arrHit?'var(--green)':'var(--red)'}">${d.arrived}</div><div class="bm-label">הגיעו (${ap}%)</div><div style="font-size:9px;color:${arrHit?'var(--green)':'var(--red)'}">${arrHit?'✓':'✗'} יעד ${TARGETS.arrRate}%</div></div><div><div class="bm-val" style="color:var(--accent)">${d.deals}</div><div class="bm-label">עסקאות (${dlp}%)</div></div><div><div class="bm-val" style="color:var(--purple)">₪${d.rev.toLocaleString('he-IL')}</div><div class="bm-label">הכנסות</div></div></div>
         <div class="branch-bar"><div style="width:${aw}%;background:var(--green)"></div><div style="width:${fw}%;background:var(--blue)"></div><div style="width:${mw}%;background:var(--red)"></div></div></div>`;
     });
     h+=`</div></div>`;
@@ -1328,7 +1329,10 @@ function renderCampaignsView(calls){
             h+=`<div style="text-align:center;min-width:52px"><div style="font-size:22px;font-weight:800;color:var(--blue)">${d.leads}</div><div style="font-size:10px;color:var(--text-muted)">לידים</div></div>`;
             h+=`<div style="text-align:center;min-width:52px"><div style="font-size:22px;font-weight:800;color:var(--green)">${d.meetings}</div><div style="font-size:10px;color:var(--text-muted)">פגישות</div></div>`;
             h+=`<div style="text-align:center;min-width:52px"><div style="font-size:22px;font-weight:800;color:var(--gold)">${d.arrived}</div><div style="font-size:10px;color:var(--text-muted)">הגיעו</div></div>`;
-            h+=`<div style="text-align:center;min-width:52px"><div style="font-size:18px;font-weight:800"><span class="badge ${cv>=15?'badge-green':cv>=8?'badge-orange':'badge-red'}" style="font-size:13px;padding:4px 10px">${cv}%</span></div><div style="font-size:10px;color:var(--text-muted);margin-top:4px">המרה</div></div>`;
+            h+=`<div style="text-align:center;min-width:52px"><div style="font-size:22px;font-weight:800;color:var(--purple)">${d.deals}</div><div style="font-size:10px;color:var(--text-muted)">עסקאות</div></div>`;
+            const dealPct=d.leads>0?Math.round((d.deals/d.leads)*100):0;
+            h+=`<div style="text-align:center;min-width:52px"><div style="font-size:18px;font-weight:800"><span class="badge ${cv>=15?'badge-green':cv>=8?'badge-orange':'badge-red'}" style="font-size:13px;padding:4px 10px">${cv}%</span></div><div style="font-size:10px;color:var(--text-muted);margin-top:4px">המרה לפגישה</div></div>`;
+            h+=`<div style="text-align:center;min-width:52px"><div style="font-size:18px;font-weight:800"><span class="badge ${dealPct>=10?'badge-green':dealPct>=5?'badge-orange':'badge-red'}" style="font-size:13px;padding:4px 10px">${dealPct}%</span></div><div style="font-size:10px;color:var(--text-muted);margin-top:4px">המרה לעסקה</div></div>`;
             if(d.rev>0){h+=`<div style="text-align:center;min-width:60px"><div style="font-size:18px;font-weight:800;color:var(--purple)">₪${d.rev.toLocaleString('he-IL')}</div><div style="font-size:10px;color:var(--text-muted)">הכנסות</div></div>`;}
             h+=`</div>`;
 
@@ -1469,15 +1473,6 @@ function buildFunnelTrend(calls){
     const dates=Object.keys(daily).sort();
     const labels=dates.map(d=>new Date(d).toLocaleDateString('he-IL',{day:'numeric',month:'short'}));
 
-    const cumulative={};
-    stages.forEach(s=>cumulative[s.key]=[]);
-    dates.forEach(d=>{
-        stages.forEach(s=>{
-            const prev=cumulative[s.key].length>0?cumulative[s.key][cumulative[s.key].length-1]:0;
-            cumulative[s.key].push(prev+(daily[d][s.key]||0));
-        });
-    });
-
     const ctx=document.getElementById('funnelTrendC');if(!ctx)return;
     const dk=isDark();
     S.charts.funnelTrend=new Chart(ctx,{
@@ -1486,10 +1481,10 @@ function buildFunnelTrend(calls){
             labels,
             datasets:stages.map(s=>({
                 label:s.label,
-                data:cumulative[s.key],
+                data:dates.map(d=>(daily[d]&&daily[d][s.key])||0),
                 borderColor:s.color,
                 backgroundColor:s.color+'18',
-                fill:true,
+                fill:false,
                 tension:0.4,
                 pointRadius:2,
                 pointHoverRadius:5,
