@@ -847,7 +847,7 @@ function getPrevPeriod(){
     return {from:pFrom,to:pTo};
 }
 
-const FUNNEL_BUFFER_DAYS=45;
+const FUNNEL_BUFFER_DAYS=90;
 async function fetchAll(){
     S.allCalls=[];S.funnelCalls=[];S.prevCalls=[];S.prevLoaded=false;
     const lo=_('lo');lo.classList.remove('hidden');
