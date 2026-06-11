@@ -945,7 +945,9 @@ function deltaHtml(cur,prev,invert){
     const d=delta(cur,prev);if(d.cls==='neutral')return'';
     const cls=invert?(d.cls==='up'?'down':'up'):d.cls;
     const arrow=d.cls==='up'?'↑':'↓';
-    return`<div class="kpi-change ${cls}">${arrow} ${d.pct}%</div>`;
+    const curN=typeof cur==='number'?cur:0;
+    const prevN=typeof prev==='number'?prev:0;
+    return`<div class="kpi-change ${cls}" title="נוכחי: ${curN.toLocaleString('he-IL')} | קודם: ${prevN.toLocaleString('he-IL')}">${arrow} ${d.pct}% <span style="font-size:9px;opacity:0.7">(${prevN.toLocaleString('he-IL')}→${curN.toLocaleString('he-IL')})</span></div>`;
 }
 
 function targetGauge(actual,target,label){
@@ -1090,9 +1092,26 @@ function renderOverview(calls){
     h+=`<div class="chart-card"><div class="chart-head"><span class="chart-title">ערוצי שיווק</span></div><div class="chart-container"><canvas id="chC"></canvas></div></div></div></div>`;
 
     if(S.prevLoaded){
-        h+=`<div class="section"><div class="section-header"><div class="section-title">השוואה לתקופה קודמת</div></div><div class="chart-card"><div class="chart-container" style="height:280px"><canvas id="compC"></canvas></div></div></div>`;
+        const prevP=getPrevPeriod();
+        const curLabel=`${S.dateFrom.toLocaleDateString('he-IL',{day:'numeric',month:'short'})} — ${S.dateTo.toLocaleDateString('he-IL',{day:'numeric',month:'short'})}`;
+        const prevLabel=`${prevP.from.toLocaleDateString('he-IL',{day:'numeric',month:'short'})} — ${prevP.to.toLocaleDateString('he-IL',{day:'numeric',month:'short'})}`;
+        const pvFiltered=pv;
+        const compDiff=t-pvFiltered.length;
+        const compPct=pvFiltered.length>0?Math.round(((t-pvFiltered.length)/pvFiltered.length)*100):0;
+        const compCls=compDiff>0?'up':compDiff<0?'down':'neutral';
+        const compArrow=compDiff>0?'↑':compDiff<0?'↓':'=';
+        const compColor=compDiff>0?'var(--green)':compDiff<0?'var(--red)':'var(--text-muted)';
+        h+=`<div class="section"><div class="section-header"><div class="section-title">השוואה לתקופה קודמת</div></div>`;
+        h+=`<div class="chart-card" style="margin-bottom:12px"><div style="display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;text-align:center">`;
+        h+=`<div><div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">תקופה נוכחית (${curLabel})</div><div style="font-size:28px;font-weight:800;color:var(--accent)">${t.toLocaleString('he-IL')}</div><div style="font-size:11px;color:var(--text-muted)">לידים</div></div>`;
+        h+=`<div style="font-size:18px;font-weight:800;color:${compColor}">${compArrow} ${Math.abs(compDiff)} (${compPct>0?'+':''}${compPct}%)</div>`;
+        h+=`<div><div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">תקופה קודמת (${prevLabel})</div><div style="font-size:28px;font-weight:800;color:var(--text-secondary)">${pvFiltered.length.toLocaleString('he-IL')}</div><div style="font-size:11px;color:var(--text-muted)">לידים</div></div>`;
+        h+=`</div></div>`;
+        h+=`<div class="chart-card"><div class="chart-container" style="height:280px"><canvas id="compC"></canvas></div></div></div>`;
     } else {
-        h+=`<div class="section"><div class="section-header"><div class="section-title">השוואה לתקופה קודמת</div></div><div class="chart-card" style="text-align:center;padding:40px 20px"><p style="color:var(--text-muted);margin-bottom:16px">נתוני תקופה קודמת לא נטענו. לחץ לטעינה ולהצגת השוואה.</p><button class="refresh-btn" onclick="loadPrevPeriod()" style="margin:auto;display:inline-flex;align-items:center;gap:6px;padding:10px 24px;font-size:14px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M3 4l17 17"/></svg> טען השוואה</button></div></div>`;
+        const prevP=getPrevPeriod();
+        const prevLabel=`${prevP.from.toLocaleDateString('he-IL',{day:'numeric',month:'short'})} — ${prevP.to.toLocaleDateString('he-IL',{day:'numeric',month:'short'})}`;
+        h+=`<div class="section"><div class="section-header"><div class="section-title">השוואה לתקופה קודמת</div></div><div class="chart-card" style="text-align:center;padding:40px 20px"><p style="color:var(--text-muted);margin-bottom:8px">נתוני תקופה קודמת לא נטענו.</p><p style="font-size:12px;color:var(--text-muted);margin-bottom:16px">תקופת השוואה: ${prevLabel}</p><button class="refresh-btn" onclick="loadPrevPeriod()" style="margin:auto;display:inline-flex;align-items:center;gap:6px;padding:10px 24px;font-size:14px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M3 4l17 17"/></svg> טען השוואה</button></div></div>`;
     }
 
     h+=`<div class="section"><div class="charts-row"><div class="chart-card"><div class="chart-head"><span class="chart-title">פילוח לפי שעות</span><div class="chart-tabs"><button class="chart-tab active" onclick="switchHoursChart('leads',this)">לידים</button><button class="chart-tab" onclick="switchHoursChart('missed',this)">לא נענו</button><button class="chart-tab" onclick="switchHoursChart('meetings',this)">פגישות</button></div></div><div class="chart-container"><canvas id="hrsC"></canvas></div></div>`;
