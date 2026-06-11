@@ -847,7 +847,7 @@ function getPrevPeriod(){
     return {from:pFrom,to:pTo};
 }
 
-const FUNNEL_BUFFER_DAYS=90;
+const FUNNEL_BUFFER_DAYS=45;
 async function fetchAll(){
     S.allCalls=[];S.funnelCalls=[];S.prevCalls=[];S.prevLoaded=false;
     const lo=_('lo');lo.classList.remove('hidden');
@@ -2170,8 +2170,16 @@ function setDP(p){
     document.querySelector(`[data-dp="${p}"]`)?.classList.add('active');
     refreshData();
 }
-_('dateFrom')?.addEventListener('change',function(){S.dateFrom=new Date(this.value);document.querySelectorAll('.date-presets button').forEach(b=>b.classList.remove('active'));refreshData();});
-_('dateTo')?.addEventListener('change',function(){S.dateTo=new Date(this.value);document.querySelectorAll('.date-presets button').forEach(b=>b.classList.remove('active'));refreshData();});
+_('dateFrom')?.addEventListener('change',function(){
+    S.dateFrom=new Date(this.value);
+    document.querySelectorAll('.date-presets button').forEach(b=>b.classList.remove('active'));
+    if(S.dateFrom&&S.dateTo&&S.dateFrom<=S.dateTo)refreshData();
+});
+_('dateTo')?.addEventListener('change',function(){
+    S.dateTo=new Date(this.value);
+    document.querySelectorAll('.date-presets button').forEach(b=>b.classList.remove('active'));
+    if(S.dateFrom&&S.dateTo&&S.dateFrom<=S.dateTo)refreshData();
+});
 
 // ═══ UTIL ═══
 function _(id){return document.getElementById(id);}
