@@ -646,7 +646,7 @@
 <div class="toast-container" id="tc"></div>
 
 <script>
-const S = { dateFrom:null, dateTo:null, allCalls:[], prevCalls:[], prevLoaded:false, charts:{}, view:'overview', branchFilter:'', channelFilter:'', tableFilter:'all', tableSearch:'', tablePage:1 };
+const S = { dateFrom:null, dateTo:null, allCalls:[], funnelCalls:[], prevCalls:[], prevLoaded:false, charts:{}, view:'overview', branchFilter:'', channelFilter:'', tableFilter:'all', tableSearch:'', tablePage:1 };
 
 const CH = {
     'google adwords':{n:'Google Ads',c:'#4285f4'},'google ads':{n:'Google Ads',c:'#4285f4'},
@@ -718,6 +718,15 @@ function isInvalid(c){return crm(c)==='ליד לא תקין';}
 function isDuplicate(c,seen){const p=getPhone(c);if(!p||p.length<6)return false;if(seen.has(p))return true;seen.add(p);return false;}
 function fc(){
     let list=S.allCalls;
+    if(S.branchFilter)list=list.filter(c=>nb(c)===S.branchFilter);
+    if(S.channelFilter)list=list.filter(c=>gCh(c).n===S.channelFilter);
+    list=list.filter(c=>!isInvalid(c));
+    const seen=new Set();
+    list=list.filter(c=>!isDuplicate(c,seen));
+    return list;
+}
+function fcFunnel(){
+    let list=S.funnelCalls;
     if(S.branchFilter)list=list.filter(c=>nb(c)===S.branchFilter);
     if(S.channelFilter)list=list.filter(c=>gCh(c).n===S.channelFilter);
     list=list.filter(c=>!isInvalid(c));
@@ -838,12 +847,18 @@ function getPrevPeriod(){
     return {from:pFrom,to:pTo};
 }
 
+const FUNNEL_BUFFER_DAYS=45;
 async function fetchAll(){
-    S.allCalls=[];S.prevCalls=[];S.prevLoaded=false;
+    S.allCalls=[];S.funnelCalls=[];S.prevCalls=[];S.prevLoaded=false;
     const lo=_('lo');lo.classList.remove('hidden');
     const sd=fd(S.dateFrom),ed=fd(S.dateTo);
+    const bufferFrom=new Date(S.dateFrom);bufferFrom.setDate(bufferFrom.getDate()-FUNNEL_BUFFER_DAYS);
+    const bsd=fd(bufferFrom);
     try{
-        S.allCalls=await fetchRange(sd,ed,'טוען');
+        const all=await fetchRange(bsd,ed,'טוען');
+        const endOfDay=new Date(S.dateTo);endOfDay.setHours(23,59,59,999);
+        S.allCalls=all.filter(c=>{const d=pd(c.called_at);return d&&d>=S.dateFrom&&d<=endOfDay;});
+        S.funnelCalls=all;
     }catch(e){console.error('fetchAll error:',e);toast(`שגיאה: ${e.message}`,'error');}
     const lb=_('lb');if(lb)lb.style.width='100%';
     setTimeout(()=>lo.classList.add('hidden'),300);
@@ -994,10 +1009,11 @@ function generateAlerts(calls,pv){
 function renderOverview(calls){
     const pvSeen=new Set();
     const pv=S.prevCalls.filter(c=>{if(S.branchFilter&&nb(c)!==S.branchFilter)return false;if(S.channelFilter&&gCh(c).n!==S.channelFilter)return false;if(isInvalid(c))return false;if(isDuplicate(c,pvSeen))return false;return true;});
+    const funnelAll=fcFunnel();
     const t=calls.length,ph=calls.filter(isC),fm=calls.filter(isF),an=calls.filter(isA),mi=calls.filter(isM);
-    const nw=calls.filter(c=>c.is_new_caller),mt=calls.filter(isMeet);
-    const ar=calls.filter(isArr),dlRaw=calls.filter(c=>da(c)>0);
-    const dl=dedupDeals(calls);
+    const nw=calls.filter(c=>c.is_new_caller),mt=funnelAll.filter(isMeet);
+    const ar=funnelAll.filter(isArr),dlRaw=funnelAll.filter(c=>da(c)>0);
+    const dl=dedupDeals(funnelAll);
     const tr=dl.reduce((s,c)=>s+da(c),0),tpd=dl.reduce((s,c)=>s+dp(c),0);
     const uniq=countUniquePhones(calls);
     const newLeads=getNewLeads(calls,pv);
@@ -1031,9 +1047,9 @@ function renderOverview(calls){
         {icon:IC.form,bg:'var(--pink-bg)',color:'var(--pink)',val:fm.length,pv:pfm,label:'טפסים',sub:pct(fm.length,t),click:'form'},
         {icon:IC.check,bg:'var(--green-bg)',color:'var(--green)',val:an.length,pv:pan,label:'שיחות שנענו',sub:`${ansRate}% מענה`},
         {icon:IC.xmark,bg:'var(--red-bg)',color:'var(--red)',val:mi.length,pv:pmi,label:'לא נענו',sub:pct(mi.length,Math.max(ph.length,1)),inv:1,click:'noanswer'},
-        {icon:IC.calendar,bg:'var(--green-bg)',color:'var(--green)',val:mt.length,pv:pmt,label:'פגישות שנקבעו',sub:`${convRate}% מלידים`,tg:targetGauge(convRate,TARGETS.meetRate,'תיאום'),click:'meeting'},
-        {icon:IC.building,bg:'var(--gold-bg)',color:'var(--gold)',val:ar.length,pv:par,label:'הגיעו לפגישה',sub:`${arrRate}% מפגישות`,tg:targetGauge(arrRate,TARGETS.arrRate,'הגעה'),click:'arrived'},
-        {icon:IC.money,bg:'var(--purple-bg)',color:'var(--purple)',val:dl.length,pv:pdl,label:'עסקאות (ייחודיות)',sub:dl.length?`ממוצע ₪${Math.round(tr/dl.length).toLocaleString('he-IL')} · ${dealRate}% המרה`:'',tg:dl.length||ar.length?targetGauge(ar.length>0?Math.round((dl.length/ar.length)*1000)/10:0,TARGETS.dealRate,'עסקה'):null,click:'deal'},
+        {icon:IC.calendar,bg:'var(--green-bg)',color:'var(--green)',val:mt.length,pv:pmt,label:'פגישות שנקבעו',sub:`כולל לידים מ-${FUNNEL_BUFFER_DAYS} יום אחורה`,tg:targetGauge(convRate,TARGETS.meetRate,'תיאום'),click:'meeting'},
+        {icon:IC.building,bg:'var(--gold-bg)',color:'var(--gold)',val:ar.length,pv:par,label:'הגיעו לפגישה',sub:`${arrRate}% מפגישות שנקבעו`,tg:targetGauge(arrRate,TARGETS.arrRate,'הגעה'),click:'arrived'},
+        {icon:IC.money,bg:'var(--purple-bg)',color:'var(--purple)',val:dl.length,pv:pdl,label:'עסקאות (ייחודיות)',sub:dl.length?`ממוצע ₪${Math.round(tr/dl.length).toLocaleString('he-IL')} · כולל לידים קודמים`:'',tg:dl.length||ar.length?targetGauge(ar.length>0?Math.round((dl.length/ar.length)*1000)/10:0,TARGETS.dealRate,'עסקה'):null,click:'deal'},
         {icon:IC.money,bg:'var(--purple-bg)',color:'var(--purple)',val:'₪'+tr.toLocaleString('he-IL'),pv:ptr,rv:tr,label:'מחזור עסקאות',sub:'',na:1},
         {icon:IC.wallet,bg:'var(--green-bg)',color:'var(--green)',val:'₪'+tpd.toLocaleString('he-IL'),pv:ppd,rv:tpd,label:'שולם בפועל',sub:tr>0?Math.round((tpd/tr)*100)+'% גבייה':'',na:1},
     ];
