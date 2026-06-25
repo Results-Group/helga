@@ -4,11 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>דאשבורד שיווק | True Beauty</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://my-fonts-bucket-results.s3.eu-north-1.amazonaws.com" crossorigin>
+    <link rel="preload" href="https://my-fonts-bucket-results.s3.eu-north-1.amazonaws.com/pingnew/ping-regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="https://my-fonts-bucket-results.s3.eu-north-1.amazonaws.com/pingnew/ping-bold.woff2" as="font" type="font/woff2" crossorigin>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
     <style>
-        @font-face { font-family: 'Ping'; src: url('https://my-fonts-bucket-results.s3.eu-north-1.amazonaws.com/pingnew/ping-regular.woff2') format('woff2'); font-weight: 400; }
-        @font-face { font-family: 'Ping'; src: url('https://my-fonts-bucket-results.s3.eu-north-1.amazonaws.com/pingnew/ping-bold.woff2') format('woff2'); font-weight: 700; }
-        @font-face { font-family: 'Ping'; src: url('https://my-fonts-bucket-results.s3.eu-north-1.amazonaws.com/pingnew/ping-heavy.woff2') format('woff2'); font-weight: 900; }
+        @font-face { font-family: 'Ping'; src: url('https://my-fonts-bucket-results.s3.eu-north-1.amazonaws.com/pingnew/ping-regular.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+        @font-face { font-family: 'Ping'; src: url('https://my-fonts-bucket-results.s3.eu-north-1.amazonaws.com/pingnew/ping-bold.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+        @font-face { font-family: 'Ping'; src: url('https://my-fonts-bucket-results.s3.eu-north-1.amazonaws.com/pingnew/ping-heavy.woff2') format('woff2'); font-weight: 900; font-display: swap; }
 
         :root {
             --bg: #f4f6fa;
@@ -627,9 +631,9 @@
         <div class="date-presets">
             <button onclick="setDP('today')" data-dp="today">היום</button>
             <button onclick="setDP('yesterday')" data-dp="yesterday">אתמול</button>
-            <button onclick="setDP('7days')" data-dp="7days">7 ימים</button>
+            <button onclick="setDP('7days')" data-dp="7days" class="active">7 ימים</button>
             <button onclick="setDP('30days')" data-dp="30days">30 יום</button>
-            <button onclick="setDP('thisMonth')" data-dp="thisMonth" class="active">החודש</button>
+            <button onclick="setDP('thisMonth')" data-dp="thisMonth">החודש</button>
             <button onclick="setDP('lastMonth')" data-dp="lastMonth">חודש שעבר</button>
             <button onclick="setDP('thisYear')" data-dp="thisYear">השנה</button>
         </div>
@@ -716,24 +720,29 @@ function gCh(c){const t=(c.tag_list||[]).map(x=>x.toLowerCase());for(const[k,v]o
 function pd(s){if(!s)return null;try{return new Date(s);}catch{return null;}}
 function isInvalid(c){return crm(c)==='ליד לא תקין';}
 function isDuplicate(c,seen){const p=getPhone(c);if(!p||p.length<6)return false;if(seen.has(p))return true;seen.add(p);return false;}
-function fc(){
-    let list=S.allCalls;
+let _fcCache=null,_fcKey='',_ffCache=null,_ffKey='';
+function _filterKey(){return `${S.branchFilter}|${S.channelFilter}|${S.allCalls.length}`;}
+function _funnelKey(){return `${S.branchFilter}|${S.channelFilter}|${S.funnelCalls.length}`;}
+function _filterList(list){
     if(S.branchFilter)list=list.filter(c=>nb(c)===S.branchFilter);
     if(S.channelFilter)list=list.filter(c=>gCh(c).n===S.channelFilter);
     list=list.filter(c=>!isInvalid(c));
     const seen=new Set();
-    list=list.filter(c=>!isDuplicate(c,seen));
-    return list;
+    return list.filter(c=>!isDuplicate(c,seen));
+}
+function fc(){
+    const k=_filterKey();
+    if(_fcCache&&_fcKey===k)return _fcCache;
+    _fcCache=_filterList(S.allCalls);_fcKey=k;
+    return _fcCache;
 }
 function fcFunnel(){
-    let list=S.funnelCalls;
-    if(S.branchFilter)list=list.filter(c=>nb(c)===S.branchFilter);
-    if(S.channelFilter)list=list.filter(c=>gCh(c).n===S.channelFilter);
-    list=list.filter(c=>!isInvalid(c));
-    const seen=new Set();
-    list=list.filter(c=>!isDuplicate(c,seen));
-    return list;
+    const k=_funnelKey();
+    if(_ffCache&&_ffKey===k)return _ffCache;
+    _ffCache=_filterList(S.funnelCalls);_ffKey=k;
+    return _ffCache;
 }
+function invalidateFcCache(){_fcCache=null;_fcKey='';_ffCache=null;_ffKey='';}
 
 function getCN(c){const f=c.form||{};const cf=c.custom_fields||{};return f.campaign_name||cf.campaign_name||c.campaign_name||c.tracking_label||'';}
 function getPL(c){const f=c.form||{};const cf=c.custom_fields||{};return f.platform||cf.platform||c.platform||'';}
@@ -816,7 +825,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     const ok=await checkAuth();
     if(!ok)return;
     await loadTargets();
-    setDP('thisMonth');
+    setDP('7days');
 });
 
 async function api(ep){
@@ -867,6 +876,7 @@ async function fetchAll(){
         const main=await fetchRange(sd,ed,'טוען');
         S.allCalls=main;
         S.funnelCalls=main;
+        invalidateFcCache();
     }catch(e){console.error('fetchAll error:',e);toast(`שגיאה: ${e.message}`,'error');}
     const lb=_('lb');if(lb)lb.style.width='100%';
     setTimeout(()=>lo.classList.add('hidden'),300);
@@ -885,6 +895,7 @@ async function fetchFunnelBuffer(){
         const endOfDay=new Date(S.dateTo);endOfDay.setHours(23,59,59,999);
         S.funnelCalls=extra.concat(S.allCalls);
         S.funnelLoaded=true;
+        invalidateFcCache();
         render();
     }catch(e){console.error('funnelBuffer error:',e);}
 }
@@ -925,12 +936,14 @@ function setView(v){
 
 function setBranchFilter(b){
     S.branchFilter=b;
+    invalidateFcCache();
     updateTitle();
     render();
 }
 
 function setChannelFilter(ch){
     S.channelFilter=ch;
+    invalidateFcCache();
     updateTitle();
     render();
 }
