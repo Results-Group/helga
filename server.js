@@ -4,6 +4,23 @@ const url = require('url');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const zlib = require('zlib');
+
+const staticCache = new Map();
+
+function sendCompressed(req, res, statusCode, contentType, body) {
+    const ae = req.headers['accept-encoding'] || '';
+    if (ae.includes('gzip')) {
+        zlib.gzip(typeof body === 'string' ? Buffer.from(body) : body, (err, compressed) => {
+            if (err) { res.writeHead(statusCode, { 'Content-Type': contentType }); res.end(body); return; }
+            res.writeHead(statusCode, { 'Content-Type': contentType, 'Content-Encoding': 'gzip', 'Vary': 'Accept-Encoding' });
+            res.end(compressed);
+        });
+    } else {
+        res.writeHead(statusCode, { 'Content-Type': contentType });
+        res.end(body);
+    }
+}
 
 const PORT = process.env.PORT || 3001;
 const CTM_API_BASE = 'https://api.calltrackingmetrics.de';
@@ -274,8 +291,7 @@ const server = http.createServer(async (req, res) => {
         if (cached && isCacheValid(cached, cacheKey)) {
             const ttl = getCacheTTL(cacheKey);
             console.log(`[CACHE] HIT (${Math.round((Date.now()-cached.time)/1000)}s old, TTL ${Math.round(ttl/60000)}m)`);
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(cached.body);
+            sendCompressed(req, res, 200, 'application/json', cached.body);
             return;
         }
 
@@ -312,9 +328,7 @@ const server = http.createServer(async (req, res) => {
                         const out = JSON.stringify(data);
                         console.log(`[API] Stripped: ${body.length} → ${out.length} bytes`);
                         cache.set(cacheKey, { body: out, time: Date.now() });
-                        persistCache();
-                        res.writeHead(200, { 'Content-Type': 'application/json' });
-                        res.end(out);
+                        sendCompressed(req, res, 200, 'application/json', out);
                     } catch(e) {
                         res.writeHead(200, { 'Content-Type': 'application/json' });
                         res.end(body);
@@ -340,10 +354,17 @@ const server = http.createServer(async (req, res) => {
     const mime = { '.html':'text/html', '.css':'text/css', '.js':'application/javascript',
                    '.json':'application/json', '.png':'image/png', '.jpg':'image/jpeg', '.svg':'image/svg+xml' };
 
+    const cached_static = staticCache.get(filePath);
+    if (cached_static) {
+        sendCompressed(req, res, 200, cached_static.type, cached_static.data);
+        return;
+    }
     fs.readFile(filePath, (err, data) => {
         if (err) { res.writeHead(404); res.end('Not Found'); return; }
-        res.writeHead(200, { 'Content-Type': mime[ext] || 'text/plain' });
-        res.end(data);
+        const ct = mime[ext] || 'text/plain';
+        staticCache.set(filePath, { data, type: ct });
+        setTimeout(() => staticCache.delete(filePath), 30000);
+        sendCompressed(req, res, 200, ct, data);
     });
 });
 

@@ -826,16 +826,27 @@ async function api(ep){
 }
 
 async function fetchRange(sd,ed,label){
-    let calls=[],p=1,tp=1,af=null;const MAX_PAGES=50;
-    const lo=_('lo'),lt=_('lt'),lb=_('lb');
-    while(p<=tp&&p<=MAX_PAGES){
-        if(lt)lt.textContent=`${label} ${p}${tp>1?`/${Math.min(tp,MAX_PAGES)}`:''}...`;
-        if(lb)lb.style.width=tp>1?`${(p/Math.min(tp,MAX_PAGES))*100}%`:'50%';
-        let u=`/calls.json?per_page=150&start_date=${sd}&end_date=${ed}`;
-        if(af)u+=`&after=${af}`;else if(p>1)u+=`&page=${p}`;
-        const d=await api(u);const cs=d.calls||[];calls=calls.concat(cs);tp=d.total_pages||1;
-        if(d.next_page){try{af=new URL(d.next_page).searchParams.get('after');}catch{af=null;}}else af=null;
-        if(!cs.length||p>=tp)break;p++;
+    const lt=_('lt'),lb=_('lb');
+    const MAX_PAGES=50,BATCH=5;
+    if(lt)lt.textContent=`${label}...`;
+    if(lb)lb.style.width='10%';
+    const u0=`/calls.json?per_page=250&start_date=${sd}&end_date=${ed}`;
+    const d0=await api(u0);
+    let calls=d0.calls||[];
+    const tp=Math.min(d0.total_pages||1,MAX_PAGES);
+    if(tp<=1)return calls;
+    if(lb)lb.style.width=`${(1/tp)*100}%`;
+    let p=2;
+    while(p<=tp){
+        const batch=[];
+        for(let i=p;i<=Math.min(p+BATCH-1,tp);i++){
+            batch.push(api(`/calls.json?per_page=250&start_date=${sd}&end_date=${ed}&page=${i}`));
+        }
+        const results=await Promise.all(batch);
+        results.forEach(d=>{if(d.calls)calls=calls.concat(d.calls);});
+        p+=BATCH;
+        if(lt)lt.textContent=`${label} ${Math.min(p-1,tp)}/${tp}...`;
+        if(lb)lb.style.width=`${(Math.min(p-1,tp)/tp)*100}%`;
     }
     return calls;
 }
@@ -849,20 +860,33 @@ function getPrevPeriod(){
 
 const FUNNEL_BUFFER_DAYS=45;
 async function fetchAll(){
-    S.allCalls=[];S.funnelCalls=[];S.prevCalls=[];S.prevLoaded=false;
+    S.allCalls=[];S.funnelCalls=[];S.prevCalls=[];S.prevLoaded=false;S.funnelLoaded=false;
     const lo=_('lo');lo.classList.remove('hidden');
     const sd=fd(S.dateFrom),ed=fd(S.dateTo);
-    const bufferFrom=new Date(S.dateFrom);bufferFrom.setDate(bufferFrom.getDate()-FUNNEL_BUFFER_DAYS);
-    const bsd=fd(bufferFrom);
     try{
-        const all=await fetchRange(bsd,ed,'טוען');
-        const endOfDay=new Date(S.dateTo);endOfDay.setHours(23,59,59,999);
-        S.allCalls=all.filter(c=>{const d=pd(c.called_at);return d&&d>=S.dateFrom&&d<=endOfDay;});
-        S.funnelCalls=all;
+        const main=await fetchRange(sd,ed,'טוען');
+        S.allCalls=main;
+        S.funnelCalls=main;
     }catch(e){console.error('fetchAll error:',e);toast(`שגיאה: ${e.message}`,'error');}
     const lb=_('lb');if(lb)lb.style.width='100%';
     setTimeout(()=>lo.classList.add('hidden'),300);
+    fetchFunnelBuffer();
     return S.allCalls;
+}
+
+async function fetchFunnelBuffer(){
+    if(S.funnelLoaded)return;
+    const sd=fd(S.dateFrom),ed=fd(S.dateTo);
+    const bufferFrom=new Date(S.dateFrom);bufferFrom.setDate(bufferFrom.getDate()-FUNNEL_BUFFER_DAYS);
+    const bsd=fd(bufferFrom);
+    if(bsd===sd)return;
+    try{
+        const extra=await fetchRange(bsd,sd,'טוען משפך');
+        const endOfDay=new Date(S.dateTo);endOfDay.setHours(23,59,59,999);
+        S.funnelCalls=extra.concat(S.allCalls);
+        S.funnelLoaded=true;
+        render();
+    }catch(e){console.error('funnelBuffer error:',e);}
 }
 
 async function loadPrevPeriod(){
