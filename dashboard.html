@@ -1011,7 +1011,7 @@ function renderOverview(calls){
     const pv=S.prevCalls.filter(c=>{if(S.branchFilter&&nb(c)!==S.branchFilter)return false;if(S.channelFilter&&gCh(c).n!==S.channelFilter)return false;if(isInvalid(c))return false;if(isDuplicate(c,pvSeen))return false;return true;});
     const funnelAll=fcFunnel();
     const t=calls.length,ph=calls.filter(isC),fm=calls.filter(isF),an=calls.filter(isA),mi=calls.filter(isM);
-    const nw=calls.filter(c=>c.is_new_caller),mt=funnelAll.filter(isMeet);
+    const nw=calls.filter(c=>c.is_new_caller),mt=calls.filter(isMeet);
     const ar=funnelAll.filter(isArr),dlRaw=funnelAll.filter(c=>da(c)>0);
     const dl=dedupDeals(funnelAll);
     const tr=dl.reduce((s,c)=>s+da(c),0),tpd=dl.reduce((s,c)=>s+dp(c),0);
@@ -1047,7 +1047,7 @@ function renderOverview(calls){
         {icon:IC.form,bg:'var(--pink-bg)',color:'var(--pink)',val:fm.length,pv:pfm,label:'טפסים',sub:pct(fm.length,t),click:'form'},
         {icon:IC.check,bg:'var(--green-bg)',color:'var(--green)',val:an.length,pv:pan,label:'שיחות שנענו',sub:`${ansRate}% מענה`},
         {icon:IC.xmark,bg:'var(--red-bg)',color:'var(--red)',val:mi.length,pv:pmi,label:'לא נענו',sub:pct(mi.length,Math.max(ph.length,1)),inv:1,click:'noanswer'},
-        {icon:IC.calendar,bg:'var(--green-bg)',color:'var(--green)',val:mt.length,pv:pmt,label:'פגישות שנקבעו',sub:`כולל לידים מ-${FUNNEL_BUFFER_DAYS} יום אחורה`,tg:targetGauge(convRate,TARGETS.meetRate,'תיאום'),click:'meeting'},
+        {icon:IC.calendar,bg:'var(--green-bg)',color:'var(--green)',val:mt.length,pv:pmt,label:'פגישות שנקבעו',sub:pct(mt.length,t),tg:targetGauge(convRate,TARGETS.meetRate,'תיאום'),click:'meeting'},
         {icon:IC.building,bg:'var(--gold-bg)',color:'var(--gold)',val:ar.length,pv:par,label:'הגיעו לפגישה',sub:`${arrRate}% מפגישות שנקבעו`,tg:targetGauge(arrRate,TARGETS.arrRate,'הגעה'),click:'arrived'},
         {icon:IC.money,bg:'var(--purple-bg)',color:'var(--purple)',val:dl.length,pv:pdl,label:'עסקאות (ייחודיות)',sub:dl.length?`ממוצע ₪${Math.round(tr/dl.length).toLocaleString('he-IL')} · כולל לידים קודמים`:'',tg:dl.length||ar.length?targetGauge(ar.length>0?Math.round((dl.length/ar.length)*1000)/10:0,TARGETS.dealRate,'עסקה'):null,click:'deal'},
         {icon:IC.money,bg:'var(--purple-bg)',color:'var(--purple)',val:'₪'+tr.toLocaleString('he-IL'),pv:ptr,rv:tr,label:'מחזור עסקאות',sub:'',na:1},
