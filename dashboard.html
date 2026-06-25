@@ -839,7 +839,7 @@ async function fetchRange(sd,ed,label){
     const MAX_PAGES=50,BATCH=5;
     if(lt)lt.textContent=`${label}...`;
     if(lb)lb.style.width='10%';
-    const u0=`/calls.json?per_page=250&start_date=${sd}&end_date=${ed}`;
+    const u0=`/calls.json?per_page=150&start_date=${sd}&end_date=${ed}`;
     const d0=await api(u0);
     let calls=d0.calls||[];
     const tp=Math.min(d0.total_pages||1,MAX_PAGES);
@@ -849,7 +849,7 @@ async function fetchRange(sd,ed,label){
     while(p<=tp){
         const batch=[];
         for(let i=p;i<=Math.min(p+BATCH-1,tp);i++){
-            batch.push(api(`/calls.json?per_page=250&start_date=${sd}&end_date=${ed}&page=${i}`));
+            batch.push(api(`/calls.json?per_page=150&start_date=${sd}&end_date=${ed}&page=${i}`));
         }
         const results=await Promise.all(batch);
         results.forEach(d=>{if(d.calls)calls=calls.concat(d.calls);});
